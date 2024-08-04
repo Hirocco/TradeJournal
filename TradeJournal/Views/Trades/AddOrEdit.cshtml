@@ -1,0 +1,94 @@
+﻿@model TradeJournal.Models.Trade
+
+@{
+    ViewData["PageTitle"] = Model.Id == 0 ? "Add trade" : "Edit trade";
+}
+
+<hr />
+<div class="row d-flex justify-content-center align-items-center">
+    <div class="col-md-7 ">
+        <form asp-action="AddOrEdit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3">
+                <ejs-datepicker id="TransactionOpenDate" name="TransactionOpenDate" placeholder="Open date" floatLabelType="Auto" format="yyyy-MM-dd"></ejs-datepicker>
+                <span asp-validation-for="TransactionOpenDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-datepicker id="TransactionCloseDate" name="TransactionCloseDate" placeholder="Close date" floatLabelType="Auto" format="yyyy-MM-dd"></ejs-datepicker>
+                <span asp-validation-for="TransactionCloseDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="SymbolName" name="SymbolName" floatLabelType="Auto" placeholder="Symbol name"></ejs-textbox>
+                <span asp-validation-for="SymbolName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <div class="e-btn-group custom-rbtn-group">
+                    <input type="radio" id="radioLong" name="PositionType" value="Long" @(Model.PositionType == "Long"  ? "checked" : "") />
+                    <label class="e-btn" for="radioLong">Long</label>
+                    <input type="radio" id="radioShort" name="PositionType" value="Short" @(Model.PositionType ==  "Short" ? "checked" : "") />
+                    <label class="e-btn" for="radioShort">Short</label>
+                </div>
+                <span asp-validation-for="PositionType" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="PositionVolume" name="PositionVolume" floatLabelType="Auto"  placeholder="Position volume"></ejs-textbox>
+                <span asp-validation-for="PositionVolume" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="EntryPrice" name="EntryPrice" floatLabelType="Auto" placeholder="Entry price"></ejs-textbox>
+                <span asp-validation-for="EntryPrice" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="StopLoss" name="StopLoss" floatLabelType="Auto"placeholder="SL"></ejs-textbox>
+                <span asp-validation-for="StopLoss" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="TakeProfit" name="TakeProfit" floatLabelType="Auto"  placeholder="TP"></ejs-textbox>
+                <span asp-validation-for="TakeProfit" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="Comission" name="Comission" floatLabelType="Auto" placeholder="Comission"></ejs-textbox>
+                <span asp-validation-for="Comission" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="Swap" name="Swap" floatLabelType="Auto"  placeholder="Swap"></ejs-textbox>
+                <span asp-validation-for="Swap" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="TradeOutcome" name="TradeOutcome" floatLabelType="Auto"  placeholder="TradeOutcome"></ejs-textbox>
+                <span asp-validation-for="TradeOutcome" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="PriceChange" name="PriceChange" floatLabelType="Auto"  placeholder="Price change (%)"></ejs-textbox>
+                <span asp-validation-for="PriceChange" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-button id="submit" type="submit" content="Submit"></ejs-button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a class="text-center" asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

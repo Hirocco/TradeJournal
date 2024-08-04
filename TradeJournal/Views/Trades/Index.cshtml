@@ -1,0 +1,91 @@
+﻿@model IEnumerable<TradeJournal.Models.Trade>
+
+@{
+    ViewData["PageTitle"] = "Trades";
+    ViewData["PageActionText"] = "+ New Category";
+    ViewData["PageActionUrl"] = "/Trades/AddOrEdit";
+}
+
+<div class="row vw-100">
+    <div class="col-md-7">
+        <ejs-grid id="trades" dataSource="@Model" allowPaging="true" allowSorting="true" gridLines="None">
+            <e-grid-pagesettings width="200" pageSize="10"></e-grid-pagesettings>
+            <e-grid-columns>
+                <e-grid-column headerText="Open date" field="TransactionOpenDate" ></e-grid-column>
+                <e-grid-column headerText="Close date" field="TransactionCloseDate" ></e-grid-column>
+                <e-grid-column headerText="Symbol" field="SymbolName" ></e-grid-column>
+                <e-grid-column headerText="Type" template="#typeTemplate"></e-grid-column>
+                <e-grid-column headerText="Volume" field="PositionVolume" ></e-grid-column>
+                <e-grid-column headerText="Entry price" field="EntryPrice" ></e-grid-column>
+                <e-grid-column headerText="Stop loss" field="StopLoss" ></e-grid-column>
+                <e-grid-column headerText="Take profit" field="TakeProfit" ></e-grid-column>
+                <e-grid-column headerText="Comission" field="Comission" ></e-grid-column>
+                <e-grid-column headerText="Swap" field="Swap" ></e-grid-column>
+                <e-grid-column headerText="Outcome" field="TradeOutcome" ></e-grid-column>
+                <e-grid-column headerText="Change" field="PriceChange" ></e-grid-column>
+                <e-grid-column headerText="Actions" template="#actionColumnTemplate"></e-grid-column>
+
+            </e-grid-columns>
+        </ejs-grid>
+    </div>
+
+</div>
+
+<script id="actionColumnTemplate" type="text/x-template">
+    <div class="d-flex flex-row justify-content-start">
+        <a class="btn btn-sm no-a-decoration" href="/Trades/AddOrEdit/${Id}">
+            <i class="fa-solid fa-pen fa-lg"></i>
+        </a>
+        <form action="/Trades/Delete/${Id}" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-link no-a-decoration"
+            onclick="return confirm(&quot;Are sure to delete this record?&quot;)">
+                <i class="fa-solid fa-trash-can fa-lg text-danger"></i>
+            </button>
+        </form>
+    </div>
+</script>
+
+<script id="typeTemplate" type="text/x-template">
+    ${if(PositionType == "Long")}
+        <span class="badge bg-success">${PositionType}</span>
+    ${else}
+        <span class="badge bg-danger">${PositionType}</span>
+    ${/if}
+
+</script>
+
+<style>
+    .e-grid .e-headercell, .e-grid .e-rowcell {
+        min-width: 200px; /* Ustaw minimalną szerokość dla wszystkich kolumn */
+    }
+    /* Custom scrollbar styles */
+    ::-webkit-scrollbar {
+        width: 12px; /* Szerokość pionowego paska przewijania */
+        height: 12px; /* Wysokość poziomego paska przewijania */
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Kolor tła paska przewijania */
+        border-radius: 10px; /* Zaokrąglone rogi paska przewijania */
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888; /* Kolor uchwytu paska przewijania */
+        border-radius: 10px; /* Zaokrąglone rogi uchwytu */
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; /* Kolor uchwytu paska przewijania po najechaniu myszką */
+        }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var grid = document.getElementById('trades').ej2_instances[0];
+        grid.columns.forEach(function (column) {
+            column.width = 200; // Ustaw szerokość kolumny
+        });
+        grid.refreshColumns();
+    });
+</script>
