@@ -1,0 +1,102 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["isDashboard"] = true;
+}
+
+@*Summary Widgets*@
+<div class="row mb-4">
+    <!--profit/loss-->
+    <div class="col-md-4">
+        <div class="d-flex flex-row widget summary income">
+            <div class="d-flex flex-column justify-content-center p-5">
+                <i class="fa-solid fa-dollar-sign fa-2xl"></i>
+            </div>
+            <div class="d-flex flex-column m-auto py-3">
+                <span class="lead">Total P/L</span>
+                <h1 class="display-6 fw-bold">@ViewBag.totalIncome</h1>
+            </div>
+        </div>
+    </div>
+
+    <!--swap/commisions-->
+    <div class="col-md-4">
+        <div class="d-flex flex-row widget summary expense">
+            <div class="d-flex flex-column justify-content-center p-5">
+                <i class="fa-solid fa-dollar-sign fa-2xl"></i>
+            </div>
+            <div class="d-flex flex-column m-auto py-3">
+                <span class="lead">Total commisions + swaps</span>
+                <h1 class="display-6 fw-bold">@ViewBag.totalSwapComissions</h1>
+            </div>
+        </div>
+    </div>
+
+    <!--roznica-->
+    <div class="col-md-4">
+        <div class="d-flex flex-row widget summary expense">
+            <div class="d-flex flex-column justify-content-center p-5">
+                <i class="fa-solid fa-dollar-sign fa-2xl"></i>
+            </div>
+            <div class="d-flex flex-column m-auto py-3">
+                <span class="lead"> Profit - (swap + commisions)<span>
+                <h1 class="display-6 fw-bold">@ViewBag.totalISC</h1>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@*Chart*@
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="widget chart">
+            <div class="p-4">
+                <h5 class="text-center fw-bold">Short/Long - P/L</h5>
+                <p class="text-center fw-bold">Based on trade outcome</p>
+            </div>
+            <ejs-accumulationchart id="doughnutchart" enableSmartLabels background="#1a222b">
+                <e-accumulation-series-collection>
+                    <e-accumulation-series xName="type" yName="amount"  name="formattedAmount" dataSource="@ViewBag.DoughnutChartData" innerRadius="50%" legendShape="Diamond">
+                        <e-accumulationseries-datalabel name="formattedAmount" visible ></e-accumulationseries-datalabel>
+                    </e-accumulation-series>
+                </e-accumulation-series-collection>
+                <e-accumulationchart-legendsettings position="Top" toggleVisibility="false">
+                    <e-legendsettings-textstyle color="#fff" size="1rem"></e-legendsettings-textstyle>
+                </e-accumulationchart-legendsettings>
+                <e-accumulationchart-tooltipsettings enable></e-accumulationchart-tooltipsettings>
+             </ejs-accumulationchart>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="widget chart">
+            <div class="p-4">
+                <h5 class="text-center fw-bold">Account profits</h5>
+                <p class="text-center fw-bold">Based on trade outcome</p>
+            </div>
+
+            <ejs-chart id="spline-chart" background="#1a222b" palettes=@(new string[]{"#54ffa9", "#ffe91a"})>
+                <e-chart-primaryxaxis valueType="Category">
+                    <e-majorgridlines width="1" color="#32414d"></e-majorgridlines>
+                </e-chart-primaryxaxis>
+                <e-chart-primaryyaxis>
+                    <e-majorgridlines width="1" color="#32414d"></e-majorgridlines>
+                </e-chart-primaryyaxis>
+
+                <e-series-collection>
+                    <e-series dataSource="@ViewBag.SplineChartData" xName="date" yName="profit" name="Profits" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Spline" width="3"></e-series>
+                    <e-series dataSource="@ViewBag.SplineChartData" xName="date" yName="loss" name="Losses" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Spline" width="3"></e-series>
+                </e-series-collection>
+                <e-chart-legendsettings position="Top" toggleVisibility="false">
+                    <e-legendsettings-textstyle color="#fff" size="1rem"></e-legendsettings-textstyle>
+                </e-chart-legendsettings>
+                <e-chart-tooltipsettings enable shared></e-chart-tooltipsettings>
+
+            </ejs-chart>
+
+        </div>
+
+    </div>
+</div>

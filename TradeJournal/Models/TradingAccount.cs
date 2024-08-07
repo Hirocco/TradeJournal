@@ -19,6 +19,10 @@ namespace TradeJournal.Models
         [Display(Name = "Server name")]
         public string Server { get; set; }
 
+        [Required]
+        [Display(Name = "Starting balance")]
+        public int StartingBalance {  get; set; }
+
         //RELACJA 
         List<Trade> trades { get; set; }
 

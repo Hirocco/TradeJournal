@@ -60,6 +60,7 @@ namespace TradeJournal.Controllers
         {
             if (ModelState.IsValid) // ten blok nie zachodzi
             {
+                Console.WriteLine("DZIALA");
                 if(trade.Id == 0) _context.Add(trade);
                 else _context.Update(trade);
 
