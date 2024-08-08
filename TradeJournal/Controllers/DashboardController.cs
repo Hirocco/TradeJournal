@@ -46,7 +46,7 @@ namespace TradeJournal.Controllers
 
             //wykres liniowy
             string[] Last7Days = Enumerable.Range(0, 7)
-                .Select(i => DateTime.Now.AddDays(i).ToString("dd-MMM"))
+                .Select(i => DateTime.Today.AddDays(-6).AddDays(i).ToString("dd-MMM"))
                 .ToArray();
 
 
@@ -79,6 +79,14 @@ namespace TradeJournal.Controllers
                                           profit = profit == null ? 0 : profit.profit,
                                           loss = loss == null ? 0 : loss.loss,
                                       };
+
+            //recent trades
+            ViewBag.recentTrades = await _appDbContext.Trades
+               .OrderByDescending(j => j.TradeAdded)
+               .Take(5)
+               .ToListAsync();
+
+
 
             return View();
         }

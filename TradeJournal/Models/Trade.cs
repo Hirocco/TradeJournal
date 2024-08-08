@@ -11,7 +11,7 @@ namespace TradeJournal.Models
 
         public DateTime TransactionOpenDate { get; set; }
         public DateTime TransactionCloseDate { get; set; }
-        public DateTime TradeAdded = DateTime.Now;
+        public DateTime TradeAdded { get; set; } = DateTime.Now;
         public string SymbolName { get; set; }
         public string PositionType { get; set; }
         public float PositionVolume { get; set; }

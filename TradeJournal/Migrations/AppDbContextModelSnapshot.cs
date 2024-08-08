@@ -89,6 +89,9 @@ namespace TradeJournal.Migrations
                     b.Property<float>("TakeProfit")
                         .HasColumnType("real");
 
+                    b.Property<DateTime>("TradeAdded")
+                        .HasColumnType("datetime2");
+
                     b.Property<float>("TradeOutcome")
                         .HasColumnType("real");
 
