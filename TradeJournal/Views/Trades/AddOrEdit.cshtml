@@ -27,15 +27,14 @@
             </div>
 
             <div class="mb-3">
-                <div class="e-btn-group custom-rbtn-group">
-                    <input type="radio" id="radioLong" name="PositionType" value="Long" @(Model.PositionType == "Long"  ? "checked" : "") />
-                    <label class="e-btn" for="radioLong">Long</label>
-                    <input type="radio" id="radioShort" name="PositionType" value="Short" @(Model.PositionType ==  "Short" ? "checked" : "") />
-                    <label class="e-btn" for="radioShort">Short</label>
+                <div class="e-btn-group custom-rbtn-group d-flex justify-content-center align-items-center">
+                    <input type="radio" id="radioLong" name="PositionType" value="Long" @(Model.PositionType == "Long" ? "checked" : "") />
+                    <label class="e-btn w-100 mx-auto" for="radioLong">Long</label>
+                    <input type="radio" id="radioShort" name="PositionType" value="Short" @(Model.PositionType == "Short" ? "checked" : "") />
+                    <label class="e-btn w-100 mx-auto" for="radioShort">Short</label>
                 </div>
                 <span asp-validation-for="PositionType" class="text-danger"></span>
             </div>
-
             <div class="mb-3">
                 <ejs-textbox id="PositionVolume" name="PositionVolume" floatLabelType="Auto"  placeholder="Position volume"></ejs-textbox>
                 <span asp-validation-for="PositionVolume" class="text-danger"></span>
@@ -76,8 +75,8 @@
                 <span asp-validation-for="PriceChange" class="text-danger"></span>
             </div>
 
-            <div class="mb-3">
-                <ejs-button id="submit" type="submit" content="Submit"></ejs-button>
+            <div class="mb-3 d-flex justify-content-center align-content-center">
+                <ejs-button cssClass="w-100" id="submit" type="submit" content="Submit"></ejs-button>
             </div>
         </form>
     </div>
@@ -88,3 +87,4 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
