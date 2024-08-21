@@ -74,7 +74,6 @@
                 <ejs-textbox id="PriceChange" name="PriceChange" floatLabelType="Auto"  placeholder="Price change (%)"></ejs-textbox>
                 <span asp-validation-for="PriceChange" class="text-danger"></span>
             </div>
-
             <div class="mb-3 d-flex justify-content-center align-content-center">
                 <ejs-button cssClass="w-100" id="submit" type="submit" content="Submit"></ejs-button>
             </div>
@@ -88,3 +87,13 @@
     }
 }
 
+<!--<form asp-action="ImportCsv" method="post" enctype="multipart/form-data">
+    <div>
+        <label for="file">Upload CSV file:</label>
+        <input type="file" name="file" />
+    </div>
+    <div>
+        <button type="submit">Import</button>
+    </div>
+</form>
+-->

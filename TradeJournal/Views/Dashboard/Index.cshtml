@@ -73,7 +73,7 @@
     <div class="col-md-8">
         <div class="widget chart">
             <div class="p-4">
-                <h5 class="text-center fw-bold">Account profits</h5>
+                <h5 class="text-center fw-bold">Account profits/losses</h5>
                 <p class="text-center fw-bold">Based on trade outcome</p>
             </div>
 
@@ -103,33 +103,57 @@
 
 @*Recent trades*@
 <div class="row">
-    <div class="col-md-6">
-        <div class="p-4">
-            <h5 class="fw-bold">Recent trades</h5>
-            <ejs-grid id="recent-transactions" dataSource="@ViewBag.recentTrades" allowSorting="true" gridLines="None">
-                <e-grid-columns>
-                      <e-grid-column headerText="Symbol" field="SymbolName" ></e-grid-column>
-                      <e-grid-column headerText="Type" template="#typeTemplate"></e-grid-column>
-                      <e-grid-column headerText="Outcome" field="TradeOutcome"></e-grid-column>
-                </e-grid-columns>
-                <e-grid-aggregates>
-                    <e-grid-aggregate>
-                        <e-aggregate-columns >
-                            <e-aggregate-column field="TradeOutcome" type="Sum" format="C2"></e-aggregate-column>
-                        </e-aggregate-columns>
-                    </e-grid-aggregate>
-                </e-grid-aggregates>
-            </ejs-grid>
+        <div class="col-md-6">
+            <div class="p-4">
+                <h5 class="fw-bold">Recent trades</h5>
+                <ejs-grid id="recent-transactions" dataSource="@ViewBag.recentTrades" allowSorting="true" gridLines="None">
+                    <e-grid-columns>
+                          <e-grid-column headerText="Symbol" field="SymbolName" ></e-grid-column>
+                          <e-grid-column headerText="Type" template="#typeTemplate"></e-grid-column>
+                          <e-grid-column headerText="Outcome" field="TradeOutcome"></e-grid-column>
+                    </e-grid-columns>
+                    <e-grid-aggregates>
+                        <e-grid-aggregate>
+                            <e-aggregate-columns >
+                                <e-aggregate-column field="TradeOutcome" type="Sum" format="C2"></e-aggregate-column>
+                            </e-aggregate-columns>
+                        </e-grid-aggregate>
+                    </e-grid-aggregates>
+                </ejs-grid>
 
+            </div>
+    </div>
+
+    <!--Dodaj wykres balansu konta-->
+    <div class="col-md-6">
+        <div class="widget chart h-100">
+            <ejs-chart id="line-chart" background="#1a222b" palettes=@(new string[]{"#54ffa9"})>
+                <e-chart-primaryxaxis valueType="Category">
+                    <e-majorgridlines width="1" color="#32414d"></e-majorgridlines>
+                </e-chart-primaryxaxis>
+
+                <e-series-collection>
+                    <e-series dataSource="@ViewBag.SplineChartDataBalance" xName="Date" yName="NetBalance" name="Account balance" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line" width="3"></e-series>
+                </e-series-collection>
+
+                <e-chart-legendsettings position="Top" toggleVisibility="false">
+                    <e-legendsettings-textstyle color="#fff" size="1rem"></e-legendsettings-textstyle>
+                </e-chart-legendsettings>
+                <e-chart-tooltipsettings enable shared></e-chart-tooltipsettings>
+
+            </ejs-chart>
         </div>
     </div>
-    <div class="col-md-6">
+
+    <!--stare-->
+    <!--div class="col-md-6">
         <div class="widget h-100">
             <div class="d-flex justify-content-center align-items-center h-100">
                 <span><i class="fa-solid fa-plus fa-2xl"></i>Widget</span>
             </div>
         </div>
-    </div>
+    </!--div-->
+
 </div>
 
 
@@ -141,25 +165,3 @@
         <span class="badge bg-danger">${PositionType}</span>
     ${/if}
 </script>
-
-
-
-<!--
-<script id="sumTemplate" type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-        // Oblicz sumę wartości TradeOutcome
-        var recentTrades = @Html.Raw(Json.Serialize(ViewBag.recentTrades));
-        var totalOutcome = recentTrades.reduce(function (acc, trade) {
-            return acc + trade.TradeOutcome;
-        }, 0);
-
-        // Zaktualizuj szablon Summary
-        var summaryTemplate = document.getElementById('SummaryTemplate').innerHTML;
-        summaryTemplate = summaryTemplate.replace('{{:totalOutcome}}', totalOutcome.toFixed(2));
-
-        // Zaktualizuj grid z nowym szablonem
-        var grid = document.getElementById('recent-transactions').ej2_instances[0];
-        grid.columns[3].template = summaryTemplate;
-        grid.refresh();
-    });
-</script>-->
