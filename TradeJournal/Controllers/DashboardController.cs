@@ -44,13 +44,21 @@ namespace TradeJournal.Controllers
                 })
                 .ToList();
 
-            //wykres liniowy
-            string[] Last7Days = Enumerable.Range(0, 7)
+            //wykres liniowy ostatniego miesiaca
+            string[] LastMonth = Enumerable.Range(0, 31)
+                .Select(i => DateTime.Today.AddDays(-30).AddDays(i).ToString("dd-MMM"))
+                .ToArray();
+
+            string[] LastQuarter = Enumerable.Range(0, 92)
+                .Select(i => DateTime.Today.AddDays(-91).AddDays(i).ToString("dd-MMM"))
+                .ToArray();
+
+            string[] LastWeek = Enumerable.Range(0, 7)
                 .Select(i => DateTime.Today.AddDays(-6).AddDays(i).ToString("dd-MMM"))
                 .ToArray();
 
 
-            // profit
+            // total profit
             List<SplineChartData> profitSummary = selectedTrades
                 .Where(i => i.TradeOutcome > 0)
                 .Select(j => new SplineChartData()
@@ -59,16 +67,22 @@ namespace TradeJournal.Controllers
                     profit = j.TradeOutcome,
                 }).ToList();
 
-            // loss
+            // total loss
+            float absLoss = 0;
             List<SplineChartData> lossSummary = selectedTrades
                 .Where(i => i.TradeOutcome < 0)
-                .Select(j => new SplineChartData()
+                .Select(j => 
                 {
-                    date = j.TradeAdded.ToString("dd-MMM"), // Example balance based on date
-                    loss = j.TradeOutcome
+                    absLoss = Math.Abs(j.TradeOutcome);
+                    return new SplineChartData()
+                    {
+                        date = j.TradeAdded.ToString("dd-MMM"), // Example balance based on date
+                        loss = absLoss
+                    };
                 }).ToList();
 
-            ViewBag.SplineChartData = from day in Last7Days
+            /*Wyswietlanie profitow i strat*/
+            ViewBag.SplineChartData = from day in LastMonth
                                       join profit in profitSummary on day equals profit.date into dayProfitJoined
                                       from profit in dayProfitJoined.DefaultIfEmpty()
                                       join loss in lossSummary on day equals loss.date into dayLossJoined
@@ -80,17 +94,68 @@ namespace TradeJournal.Controllers
                                           loss = loss == null ? 0 : loss.loss,
                                       };
 
+
+            
+            // total 
+            // Etap 1: Obliczanie kumulatywnego bilansu
+            float cumulativeBalance = 0; // Zmienna przechowująca kumulatywny bilans
+
+            List<SplineChartDataBalance> totalNetBalance = selectedTrades
+               .Select(t =>
+               {
+                   cumulativeBalance += t.TradeOutcome; // Aktualizuj kumulatywny bilans
+
+                   return new SplineChartDataBalance()
+                   {
+                       Date = t.TransactionCloseDate.ToString("dd-MMM"),
+                       NetBalance = cumulativeBalance // Przypisz aktualny kumulatywny bilans
+                   };
+               }).ToList();
+
+            // Etap 2: Przetwarzanie danych w celu zachowania ostatniego bilansu w dniach bez transakcji
+            cumulativeBalance = totalNetBalance.Last().NetBalance; // Zainicjuj kumulatywny bilans ostatnią wartością z poprzedniego etapu
+
+            ViewBag.SplineChartDataBalance = LastMonth
+               .Select(day =>
+               {
+                   var balance = totalNetBalance.FirstOrDefault(b => b.Date == day);
+                   if (balance == null)
+                   {
+                       return new SplineChartDataBalance()
+                       {
+                           Date = day,
+                           NetBalance = cumulativeBalance // Utrzymanie ostatniego znanego bilansu
+                       };
+                   }
+                   else
+                   {
+                       cumulativeBalance = balance.NetBalance; // Aktualizacja bilansu na ten dzień
+                       return balance;
+                   }
+               }).ToList();
+
+
+
             //recent trades
             ViewBag.recentTrades = await _appDbContext.Trades
                .OrderByDescending(j => j.TradeAdded)
-               .Take(5)
+               .Take(7)
                .ToListAsync();
 
+          
 
 
             return View();
+
         }
     }
+
+    public class SplineChartDataBalance
+    {
+        public string Date { get; set; }
+        public float NetBalance { get; set; } = 0;
+    } 
+    
     public class SplineChartData
     {
         public string date;
