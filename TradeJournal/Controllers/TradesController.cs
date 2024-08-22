@@ -37,6 +37,7 @@ namespace TradeJournal.Controllers
         {
             if (id == null)
             {
+                
                 return NotFound();
             }
 
@@ -50,39 +51,7 @@ namespace TradeJournal.Controllers
             return View(trade);
         }
 
-        /*Nie testowane*/
-        public IActionResult ImportCSV(string filePath)
-        {
-            try
-            {
-                if (System.IO.File.Exists(filePath))
-                {
-
-                    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                    {
-                        HasHeaderRecord = true
-                    };
-                    using (StreamReader streamReader = new StreamReader(filePath))
-                    using (CsvReader csvReader = new CsvReader(streamReader, config))
-                    {
-
-                        // Read records from the CSV file
-                        IEnumerable<Trade> records = csvReader.GetRecords<Trade>();
-
-                        // Process each record
-                        foreach (Trade trade in records)
-                        {
-                            Console.WriteLine($"Id: {trade.Id}, Symbol: {trade.SymbolName}");
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-            return View();
-        }
+       
 
         // GET: Trades/AddOrEdit
         public IActionResult AddOrEdit(int id=0)

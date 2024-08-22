@@ -19,10 +19,10 @@
                 <e-grid-column headerText="Entry price" field="EntryPrice" ></e-grid-column>
                 <e-grid-column headerText="Stop loss" field="StopLoss" ></e-grid-column>
                 <e-grid-column headerText="Take profit" field="TakeProfit" ></e-grid-column>
-                <e-grid-column headerText="Comission" field="Comission" ></e-grid-column>
-                <e-grid-column headerText="Swap" field="Swap" ></e-grid-column>
+                <!--e-grid-column headerText="Comission" field="Comission" ></!--e-grid-column-->
+                <!--e-grid-column headerText="Swap" field="Swap" ></!--e-grid-column-->
                 <e-grid-column headerText="Outcome" field="TradeOutcome" ></e-grid-column>
-                <e-grid-column headerText="Change" field="PriceChange" ></e-grid-column>
+                <!--e-grid-column headerText="Change" field="PriceChange" ></!--e-grid-column-->
                 <e-grid-column headerText="Actions" template="#actionColumnTemplate"></e-grid-column>
 
             </e-grid-columns>
@@ -41,6 +41,12 @@
             <button type="submit" class="btn btn-sm btn-link no-a-decoration"
             onclick="return confirm(&quot;Are sure to delete this record?&quot;)">
                 <i class="fa-solid fa-trash-can fa-lg text-danger"></i>
+            </button>
+        </form>
+        <form action="/Trades/Details/${Id}" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-sm btn-link no-a-decoration">
+                <i class="fa fa-area-chart fa-solid fa-lg text-success"></i>
             </button>
         </form>
     </div>

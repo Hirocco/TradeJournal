@@ -108,6 +108,7 @@
                 <h5 class="fw-bold">Recent trades</h5>
                 <ejs-grid id="recent-transactions" dataSource="@ViewBag.recentTrades" allowSorting="true" gridLines="None">
                     <e-grid-columns>
+                          <e-grid-column headerText="Id" field="Id"></e-grid-column>
                           <e-grid-column headerText="Symbol" field="SymbolName" ></e-grid-column>
                           <e-grid-column headerText="Type" template="#typeTemplate"></e-grid-column>
                           <e-grid-column headerText="Outcome" field="TradeOutcome"></e-grid-column>
@@ -145,14 +146,7 @@
         </div>
     </div>
 
-    <!--stare-->
-    <!--div class="col-md-6">
-        <div class="widget h-100">
-            <div class="d-flex justify-content-center align-items-center h-100">
-                <span><i class="fa-solid fa-plus fa-2xl"></i>Widget</span>
-            </div>
-        </div>
-    </!--div-->
+
 
 </div>
 

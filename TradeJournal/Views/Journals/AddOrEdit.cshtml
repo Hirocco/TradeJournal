@@ -1,0 +1,67 @@
+﻿@model TradeJournal.Models.Journal
+
+@{
+    ViewData["PageTitle"] = "Add note";
+
+
+    var tools = new[] {
+        "Bold", "Italic", "Underline", "StrikeThrough",
+        "FontName", "FontSize", "FontColor", "BackgroundColor",
+        "LowerCase", "UpperCase", "|",
+        "Formats", "Alignments", "OrderedList", "UnorderedList",
+        "Outdent", "Indent", "|",
+        "CreateLink", "Image", "CreateTable", "|", "ClearFormat", "Print",
+        "SourceCode", "FullScreen", "|", "Undo", "Redo"
+};
+}
+
+
+<h4>Journal</h4>
+<hr />
+<div class="row d-flex justify-content-center align-items-center ">
+    <div class="col-md-7">
+        <form asp-action="AddOrEdit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3 w-100">
+                <ejs-richtexteditor id="Text">
+                    <e-richtexteditor-toolbarsettings items="tools"></e-richtexteditor-toolbarsettings>
+                </ejs-richtexteditor>
+                <span asp-validation-for="@Model.Text" class="text-danger"></span>
+            </div>
+  
+            <div class="mb-3 ">
+                <label asp-for="TradeId" class="control-label"></label>
+                <select asp-for="@Model.TradeId" class ="form-control" asp-items="ViewBag.TradeId"></select>
+            </div>
+            <div class="mb-3">
+                <ejs-button cssClass="w-100" id="submit" type="submit" content="Submit"></ejs-button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+
+<!--
+<div class="form-group">
+    <label asp-for="Title" class="control-label"></label>
+    <input asp-for="Title" class="form-control" />
+    <span asp-validation-for="Title" class="text-danger"></span>
+</div>
+<div class="form-group">
+    <label asp-for="Image" class="control-label"></label>
+    <input asp-for="Image" class="form-control" />
+    <span asp-validation-for="Image" class="text-danger"></span>
+</div>
+-->
+
+ 

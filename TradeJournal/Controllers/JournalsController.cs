@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -45,80 +46,40 @@ namespace TradeJournal.Controllers
             return View(journal);
         }
 
+
         // GET: Journals/Create
-        public IActionResult Create()
+        public IActionResult AddOrEdit(int id=0)
         {
+            Console.WriteLine("ŁADOWANIE");
             ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id");
-            return View();
-        }
+			if (id == 0) return View(new Journal());
+			else return View(_context.Journals.Find(id));
+		}
 
         // POST: Journals/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Text,Title,Image,TradeId")] Journal journal)
+        public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] Journal journal)
         {
+            Console.WriteLine("BINDOWANIE");
+            // DO TEGO MOMENTU DZIALA
             if (ModelState.IsValid)
             {
-                _context.Add(journal);
+				Console.WriteLine("WALIDACJA PRZESZLA ");
+
+                if (journal.Id == 0) _context.Add(journal);
+                else _context.Update(journal);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id", journal.TradeId);
-            return View(journal);
-        }
 
-        // GET: Journals/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+              var errors = ModelState.Values.SelectMany(v => v.Errors);
+              foreach (var error in errors)  System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
 
-            var journal = await _context.Journals.FindAsync(id);
-            if (journal == null)
-            {
-                return NotFound();
-            }
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id", journal.TradeId);
-            return View(journal);
-        }
-
-        // POST: Journals/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Text,Title,Image,TradeId")] Journal journal)
-        {
-            if (id != journal.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(journal);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!JournalExists(journal.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id", journal.TradeId);
             return View(journal);
         }
 
