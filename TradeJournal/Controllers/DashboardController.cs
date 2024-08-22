@@ -139,7 +139,7 @@ namespace TradeJournal.Controllers
             //recent trades
             ViewBag.recentTrades = await _appDbContext.Trades
                .OrderByDescending(j => j.TradeAdded)
-               .Take(7)
+               .Take(5)
                .ToListAsync();
 
           

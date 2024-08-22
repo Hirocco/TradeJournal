@@ -18,9 +18,8 @@ namespace TradeJournal.Models
         public byte[] Image { get; set; }
         */
         // relacje 
-        [Range(1, int.MaxValue, ErrorMessage = "Please select trade.")]
         public int TradeId { get; set; }
-        public Trade Trade { get; set; }
+        public Trade? Trade { get; set; }
 
     }
 }

@@ -64,7 +64,12 @@ namespace TradeJournal.Controllers
         public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] Journal journal)
         {
             Console.WriteLine("BINDOWANIE");
-            // DO TEGO MOMENTU DZIALA
+            /*Do tego momentu wszystko dziala i ponizsze sie wypisuja*/
+            Console.WriteLine(ModelState.IsValid);
+            Console.WriteLine(journal.Id);
+            Console.WriteLine(journal.Text);
+            Console.WriteLine(journal.TradeId);
+            Console.WriteLine(journal.Trade);
             if (ModelState.IsValid)
             {
 				Console.WriteLine("WALIDACJA PRZESZLA ");
@@ -112,7 +117,7 @@ namespace TradeJournal.Controllers
             {
                 _context.Journals.Remove(journal);
             }
-
+            if (_context.Journals == null) return Problem("Entity set 'ApplicationDbContext.Journals'  is null.");
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

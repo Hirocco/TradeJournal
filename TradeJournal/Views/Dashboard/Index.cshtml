@@ -104,7 +104,7 @@
 @*Recent trades*@
 <div class="row">
         <div class="col-md-6">
-            <div class="p-4">
+            <div class="p-4 widget">
                 <h5 class="fw-bold">Recent trades</h5>
                 <ejs-grid id="recent-transactions" dataSource="@ViewBag.recentTrades" allowSorting="true" gridLines="None">
                     <e-grid-columns>
@@ -127,10 +127,26 @@
 
     <!--Dodaj wykres balansu konta-->
     <div class="col-md-6">
-        <div class="widget h-100">
-            <div class="d-flex justify-content-center align-items-center h-100">
-                <span><i class="fa-solid fa-plus fa-2xl"></i>Widget</span>
+        <div class="widget chart">
+            <div class="p-4">
+                <h5 class="text-center fw-bold">Account balance</h5>
             </div>
+
+            <ejs-chart height="50%" id="line-chart" background="#1a222b" palettes=@(new string[]{"#54ffa9"})>
+                <e-chart-primaryxaxis valueType="Category">
+                    <e-majorgridlines width="1" color="#32414d"></e-majorgridlines>
+                </e-chart-primaryxaxis>
+
+                <e-series-collection>
+                    <e-series dataSource="@ViewBag.SplineChartDataBalance" xName="Date" yName="NetBalance" name="Balance" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Spline" width="3"></e-series>
+                </e-series-collection>
+                <e-chart-legendsettings position="Top" toggleVisibility="false">
+                    <e-legendsettings-textstyle color="#fff" size="1rem"></e-legendsettings-textstyle>
+                </e-chart-legendsettings>
+                <e-chart-tooltipsettings enable shared></e-chart-tooltipsettings>
+
+            </ejs-chart>
+
         </div>
     </div>
 </div>

@@ -12,7 +12,7 @@ namespace TradeJournal.Data
         public DbSet<Trade> Trades { get; set; }
         public DbSet<Journal> Journals { get; set; }
 
-
+        /*
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -22,6 +22,6 @@ namespace TradeJournal.Data
                 .HasForeignKey(e => e.TradeId)
                 .HasPrincipalKey(e => e.Id);
 
-        }
+        }*/
     }
 }
