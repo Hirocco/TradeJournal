@@ -127,27 +127,12 @@
 
     <!--Dodaj wykres balansu konta-->
     <div class="col-md-6">
-        <div class="widget chart h-100">
-            <ejs-chart id="line-chart" background="#1a222b" palettes=@(new string[]{"#54ffa9"})>
-                <e-chart-primaryxaxis valueType="Category">
-                    <e-majorgridlines width="1" color="#32414d"></e-majorgridlines>
-                </e-chart-primaryxaxis>
-
-                <e-series-collection>
-                    <e-series dataSource="@ViewBag.SplineChartDataBalance" xName="Date" yName="NetBalance" name="Account balance" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line" width="3"></e-series>
-                </e-series-collection>
-
-                <e-chart-legendsettings position="Top" toggleVisibility="false">
-                    <e-legendsettings-textstyle color="#fff" size="1rem"></e-legendsettings-textstyle>
-                </e-chart-legendsettings>
-                <e-chart-tooltipsettings enable shared></e-chart-tooltipsettings>
-
-            </ejs-chart>
+        <div class="widget h-100">
+            <div class="d-flex justify-content-center align-items-center h-100">
+                <span><i class="fa-solid fa-plus fa-2xl"></i>Widget</span>
+            </div>
         </div>
     </div>
-
-
-
 </div>
 
 
