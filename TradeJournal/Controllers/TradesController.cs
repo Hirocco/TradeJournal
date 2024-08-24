@@ -11,13 +11,14 @@ using TradeJournal.Data;
 using TradeJournal.Models;
 using CsvHelper.Configuration;
 using CsvHelper;
+using TradeJournal.ViewModels;
 
 namespace TradeJournal.Controllers
 {
     public class TradesController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly ImportTrade _csvImporter;
+        private readonly ImportTrade _csvImporter; // to do 
 
         public TradesController(AppDbContext context)
         {
@@ -32,26 +33,39 @@ namespace TradeJournal.Controllers
             return View(await _context.Trades.ToListAsync());
         }
 
-        // GET: Trades/Details/5
+        //do poprawy
+        // GET: Trades/Details/{Id}
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                
-                return NotFound();
-            }
+            // nie znaleziono/istnieje id 
+            if (id == null) return NotFound();
+            
 
             var trade = await _context.Trades
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (trade == null)
-            {
-                return NotFound();
-            }
 
-            return View(trade);
+            //nie znaleziono trade
+            if (trade == null) return NotFound();
+     
+            //podlaczanie notatki pod trade
+            var journal = new Journal
+            {
+                TradeId = trade.Id
+            };
+
+            //tworzenie viewModelu
+            var viewModel = new TradesJournalsViewModels
+            {
+                Trade = trade,
+                Journal = journal
+            };
+
+            
+           //zwracamy oba
+            return View(viewModel);
         }
 
-        /*Nie testowane*/
+        /*Nie testowane - testowane - NIE DZIALA :)*/
         public IActionResult ImportCSV(string filePath)
         {
             try

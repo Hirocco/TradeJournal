@@ -47,46 +47,77 @@ namespace TradeJournal.Controllers
         }
 
 
-        // GET: Journals/Create
-        public IActionResult AddOrEdit(int id=0)
+        // GET: Journals/AddOrEdit
+        public IActionResult AddOrEdit(int id = 0)
         {
             Console.WriteLine("ŁADOWANIE");
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id");
-			if (id == 0) return View(new Journal());
-			else return View(_context.Journals.Find(id));
-		}
 
-        // POST: Journals/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+            // Załaduj listę TradeId do ViewBag
+            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id");
+
+            if (id == 0)
+            {
+                // Jeśli id jest 0, zwróć pusty model Journal do widoku
+                return View(new Journal());
+            }
+            else
+            {
+                // Jeśli id jest różne od 0, znajdź istniejący wpis w bazie danych
+                var journal = _context.Journals.FirstOrDefault(j => j.Id == id);
+                if (journal == null)
+                {
+                    return NotFound();
+                }
+                return View(journal);
+            }
+        }
+
+        // POST: Journals/AddOrEdit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] Journal journal)
         {
             Console.WriteLine("BINDOWANIE");
-            /*Do tego momentu wszystko dziala i ponizsze sie wypisuja*/
-            Console.WriteLine(ModelState.IsValid);
-            Console.WriteLine(journal.Id);
-            Console.WriteLine(journal.Text);
-            Console.WriteLine(journal.TradeId);
-            Console.WriteLine(journal.Trade);
+            Console.WriteLine("IsValid: " + ModelState.IsValid);
+            Console.WriteLine("Id: " + journal.Id);
+            Console.WriteLine("Text: " + journal.Text);
+            Console.WriteLine("TradeId: " + journal.TradeId);
+
             if (ModelState.IsValid)
             {
-				Console.WriteLine("WALIDACJA PRZESZLA ");
+                Console.WriteLine("WALIDACJA PRZESZLA ");
 
-                if (journal.Id == 0) _context.Add(journal);
-                else _context.Update(journal);
+                if (journal.Id == 0)
+                {
+                    // Dodaj nowy rekord
+                    _context.Add(journal);
+                }
+                else
+                {
+                    // Aktualizuj istniejący rekord
+                    _context.Update(journal);
+                }
 
+                // Zapisz zmiany w bazie danych
                 await _context.SaveChangesAsync();
+
+                // Przekieruj do Index lub innej strony po zapisaniu
                 return RedirectToAction(nameof(Index));
             }
+
+            // Jeśli model jest nieprawidłowy, zwróć użytkownika do widoku z błędami walidacji
             ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id", journal.TradeId);
 
-              var errors = ModelState.Values.SelectMany(v => v.Errors);
-              foreach (var error in errors)  System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
+            // Logowanie błędów walidacji do debugowania
+            var errors = ModelState.Values.SelectMany(v => v.Errors);
+            foreach (var error in errors)
+            {
+                System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
+            }
 
             return View(journal);
         }
+
 
         // GET: Journals/Delete/5
         public async Task<IActionResult> Delete(int? id)

@@ -1,8 +1,9 @@
 ﻿@model TradeJournal.Models.Journal
 
 @{
-    ViewData["PageTitle"] = "Add note";
-
+    ViewData["PageTitle"] = "Journals";
+    ViewData["PageActionText"] = "+ Add note";
+    ViewData["PageActionUrl"] = "/Journals/AddOrEdit";
 
     var tools = new[] {
         "Bold", "Italic", "Underline", "StrikeThrough",
@@ -12,7 +13,7 @@
         "Outdent", "Indent", "|",
         "CreateLink", "Image", "CreateTable", "|", "ClearFormat", "Print",
         "SourceCode", "FullScreen", "|", "Undo", "Redo"
-};
+    };
 }
 
 
@@ -21,11 +22,11 @@
 <div class="row d-flex justify-content-center align-items-center ">
     <div class="col-md-7">
         <form asp-action="AddOrEdit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly"  class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
 
             <div class="mb-3 w-100">
-                <ejs-richtexteditor id="Text">
+                <ejs-richtexteditor id="Text" value="@Model.Text">
                     <e-richtexteditor-toolbarsettings items="tools"></e-richtexteditor-toolbarsettings>
                 </ejs-richtexteditor>
                 <span asp-validation-for="@Model.Text" class="text-danger"></span>
