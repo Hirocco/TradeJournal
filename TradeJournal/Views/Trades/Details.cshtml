@@ -5,6 +5,8 @@
     ViewData["Title"] = "Details";
 }
 
+<!--Błąd jest tutaj, bo nie zwracamy bezpośrednio Trade, tylko model.Trade -->
+
 <h1>Details</h1>
 
 <div>
@@ -85,9 +87,19 @@
         </dd>
     </dl>
 </div>
+
 <div>
-    <!-- tutaj notatki-->
-    @Html.Partial("AddOrEdit", Model.Journal)
+    @if (Model.Journal != null)
+    {
+        System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
+        await Html.PartialAsync("AddOrEdit", Model.Journal); // jak dam Model.Trade to działa, ale mam widok z trade, zas Model.Journal wywali błąd
+    }
+    else
+    {
+        System.Diagnostics.Debug.WriteLine("Journal is null.");
+        <p>Journal data is not available or the model type is incorrect.</p>
+    }
+
 </div>
 <div>
     <a asp-action="Edit" class="btn btn-success" asp-route-id="@Model?.Trade.Id">Edit</a> 

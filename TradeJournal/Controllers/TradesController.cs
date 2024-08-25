@@ -33,7 +33,7 @@ namespace TradeJournal.Controllers
             return View(await _context.Trades.ToListAsync());
         }
 
-        //do poprawy
+
         // GET: Trades/Details/{Id}
         public async Task<IActionResult> Details(int? id)
         {
@@ -65,41 +65,7 @@ namespace TradeJournal.Controllers
             return View(viewModel);
         }
 
-        /*Nie testowane - testowane - NIE DZIALA :)*/
-        public IActionResult ImportCSV(string filePath)
-        {
-            try
-            {
-                if (System.IO.File.Exists(filePath))
-                {
-
-                    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                    {
-                        HasHeaderRecord = true
-                    };
-                    using (StreamReader streamReader = new StreamReader(filePath))
-                    using (CsvReader csvReader = new CsvReader(streamReader, config))
-                    {
-
-                        // Read records from the CSV file
-                        IEnumerable<Trade> records = csvReader.GetRecords<Trade>();
-
-                        // Process each record
-                        foreach (Trade trade in records)
-                        {
-                            Console.WriteLine($"Id: {trade.Id}, Symbol: {trade.SymbolName}");
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-            return View();
-        }
-
-       
+    
 
         // GET: Trades/AddOrEdit
         public IActionResult AddOrEdit(int id=0)
@@ -150,8 +116,8 @@ namespace TradeJournal.Controllers
             return _context.Trades.Any(e => e.Id == id);
         }
         
-
-
+        // strefa smierci, ponizej nic nie dziala
+        
         /*TODO NAPRAWIC MAPOWANIE IDK CZEMU NIE ZNAJDUJE WIDOKU*/
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -171,6 +137,42 @@ namespace TradeJournal.Controllers
 
             return View();
         }
+
+        /*Nie testowane - testowane - NIE DZIALA :)*/
+        public IActionResult ImportCSV(string filePath)
+        {
+            try
+            {
+                if (System.IO.File.Exists(filePath))
+                {
+
+                    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        HasHeaderRecord = true
+                    };
+                    using (StreamReader streamReader = new StreamReader(filePath))
+                    using (CsvReader csvReader = new CsvReader(streamReader, config))
+                    {
+
+                        // Read records from the CSV file
+                        IEnumerable<Trade> records = csvReader.GetRecords<Trade>();
+
+                        // Process each record
+                        foreach (Trade trade in records)
+                        {
+                            Console.WriteLine($"Id: {trade.Id}, Symbol: {trade.SymbolName}");
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            return View();
+        }
+
+
 
     }
 }
