@@ -1,9 +1,10 @@
-﻿@model TradeJournal.Models.Journal
+﻿@model TradeJournal.Models.Journal;
 
 @{
+    /*
     ViewData["PageTitle"] = "Journals";
     ViewData["PageActionText"] = "+ Add note";
-    ViewData["PageActionUrl"] = "/Journals/AddOrEdit";
+    ViewData["PageActionUrl"] = "/Journals/AddOrEdit";*/
 
     var tools = new[] {
         "Bold", "Italic", "Underline", "StrikeThrough",
@@ -21,48 +22,26 @@
 <hr />
 <div class="row d-flex justify-content-center align-items-center ">
     <div class="col-md-7">
-        <form asp-action="AddOrEdit">
+        <form asp-controller="Journals" asp-action="AddOrEdit"> <!--tu jest blad, przekeirowywuje zle, bo zamiast do journals to do trades-->
             <div asp-validation-summary="ModelOnly"  class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="@Model.Id" />
+            <input type="hidden" asp-for="@Model.TradeId"/>
 
-            <div class="mb-3 w-100">
+             <div class="mb-3 w-100">
                 <ejs-richtexteditor id="Text" value="@Model.Text">
-                    <e-richtexteditor-toolbarsettings items="tools"></e-richtexteditor-toolbarsettings>
+                    <e-richtexteditor-toolbarsettings  items="tools"></e-richtexteditor-toolbarsettings>
+                        
                 </ejs-richtexteditor>
                 <span asp-validation-for="@Model.Text" class="text-danger"></span>
-            </div>
-  
-            <div class="mb-3 ">
-                <label asp-for="TradeId" class="control-label"></label>
-                <select asp-for="@Model.TradeId" class ="form-control" asp-items="ViewBag.TradeId"></select>
-            </div>
+             </div>
+
             <div class="mb-3">
-                <ejs-button cssClass="w-100" id="submit" type="submit" content="Submit"></ejs-button>
+                <ejs-button cssClass="w-100" id="submit" type="submit" content="Add note"></ejs-button>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-
-
-<!--
-<div class="form-group">
-    <label asp-for="Title" class="control-label"></label>
-    <input asp-for="Title" class="form-control" />
-    <span asp-validation-for="Title" class="text-danger"></span>
-</div>
-<div class="form-group">
-    <label asp-for="Image" class="control-label"></label>
-    <input asp-for="Image" class="form-control" />
-    <span asp-validation-for="Image" class="text-danger"></span>
-</div>
--->
-
- 

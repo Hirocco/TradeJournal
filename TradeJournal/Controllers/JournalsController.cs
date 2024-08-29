@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TradeJournal.Data;
 using TradeJournal.Models;
+using TradeJournal.ViewModels;
 
 namespace TradeJournal.Controllers
 {
@@ -36,39 +37,41 @@ namespace TradeJournal.Controllers
             }
 
             var journal = await _context.Journals
-                .Include(j => j.Trade)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(t => t.TradeId)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            var trade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == journal.TradeId);
+
+
             if (journal == null)
             {
                 return NotFound();
             }
 
-            return View(journal);
+            var viewModel = new TradesJournalsViewModels
+            {
+                Trade = trade,
+                Journal = journal // Zakładamy, że Journal jest powiązany z Trade
+            };
+
+            return PartialView("AddOrEdit", viewModel);
         }
+
 
 
         // GET: Journals/AddOrEdit
         public IActionResult AddOrEdit(int id = 0)
         {
-            Console.WriteLine("ŁADOWANIE");
+            // blad jest dlatego, bo nie tworzy sie nowy journal, tylko kpiuje id z trade i probje aktualizowac cos co nie istnieje
 
-            // Załaduj listę TradeId do ViewBag
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id");
+            if (id == 0) return View(new Journal()); // Jeśli id jest 0, zwróć pusty model Journal do widoku
 
-            if (id == 0)
-            {
-                // Jeśli id jest 0, zwróć pusty model Journal do widoku
-                return View(new Journal());
-            }
             else
             {
-                // Jeśli id jest różne od 0, znajdź istniejący wpis w bazie danych
                 var journal = _context.Journals.FirstOrDefault(j => j.Id == id);
-                if (journal == null)
-                {
-                    return NotFound();
-                }
-                return View(journal);
+                if (journal == null) return NotFound(); // Jeśli id jest różne od 0, znajdź istniejący wpis w bazie danych
+
+                return PartialView("AddOrEdit", journal);
             }
         }
 
@@ -77,36 +80,50 @@ namespace TradeJournal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] Journal journal)
         {
-            Console.WriteLine("BINDOWANIE");
-            Console.WriteLine("IsValid: " + ModelState.IsValid);
-            Console.WriteLine("Id: " + journal.Id);
-            Console.WriteLine("Text: " + journal.Text);
-            Console.WriteLine("TradeId: " + journal.TradeId);
 
             if (ModelState.IsValid)
             {
-                Console.WriteLine("WALIDACJA PRZESZLA ");
+                if (journal.Id == 0)  _context.Add(journal);   // Dodaj nowy rekord
 
-                if (journal.Id == 0)
+                else _context.Update(journal); // Aktualizuj istniejący rekord
+
+                
+                try { await _context.SaveChangesAsync(); } // Zapisz zmiany w bazie danych
+                catch (DbUpdateConcurrencyException dbException)
                 {
-                    // Dodaj nowy rekord
-                    _context.Add(journal);
-                }
-                else
-                {
-                    // Aktualizuj istniejący rekord
-                    _context.Update(journal);
-                }
+                    //The code from Microsoft - Resolving concurrency conflicts 
+                    foreach (var entry in dbException.Entries)
+                    {
+                        if (entry.Entity is Journal)
+                        {
+                            var proposedValues = entry.CurrentValues; //Your proposed changes
+                            var databaseValues = entry.GetDatabaseValues(); //Values in the Db
 
-                // Zapisz zmiany w bazie danych
-                await _context.SaveChangesAsync();
+                            foreach (var property in proposedValues.Properties)
+                            {
+                                var proposedValue = proposedValues[property];
+                                var databaseValue = databaseValues[property];
 
-                // Przekieruj do Index lub innej strony po zapisaniu
-                return RedirectToAction(nameof(Index));
+                                // TODO: decide which value should be written to database
+                                // proposedValues[property] = <value to be saved>;
+                            }
+
+                            // Refresh original values to bypass next concurrency check
+                            entry.OriginalValues.SetValues(databaseValues);
+                        }
+                        else
+                        {
+                            throw new NotSupportedException(
+                                "Don't know how to handle concurrency conflicts for "
+                                + entry.Metadata.Name);
+                        }
+                    }
+                }
+                
+
+               
+                return PartialView("AddOrEdit", journal);  // Przekieruj do Trades/Details/{Id}
             }
-
-            // Jeśli model jest nieprawidłowy, zwróć użytkownika do widoku z błędami walidacji
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id", journal.TradeId);
 
             // Logowanie błędów walidacji do debugowania
             var errors = ModelState.Values.SelectMany(v => v.Errors);
@@ -115,28 +132,11 @@ namespace TradeJournal.Controllers
                 System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
             }
 
-            return View(journal);
+            return PartialView("AddOrEdit", journal);
         }
 
 
-        // GET: Journals/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var journal = await _context.Journals
-                .Include(j => j.Trade)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (journal == null)
-            {
-                return NotFound();
-            }
-
-            return View(journal);
-        }
+     
 
         // POST: Journals/Delete/5
         [HttpPost, ActionName("Delete")]

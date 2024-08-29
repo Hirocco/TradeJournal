@@ -80,15 +80,17 @@ namespace TradeJournal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit([Bind("Id,TransactionOpenDate,TransactionCloseDate,SymbolName,PositionType,PositionVolume,EntryPrice,StopLoss,TakeProfit,Comission,Swap,TradeOutcome,PriceChange")] Trade trade)
         {
+
             if (ModelState.IsValid) 
             {
                 if(trade.Id == 0) _context.Add(trade);
                 else _context.Update(trade);
 
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(trade);
+
             }
-            
+
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             foreach (var error in errors)  System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
 
@@ -116,62 +118,7 @@ namespace TradeJournal.Controllers
             return _context.Trades.Any(e => e.Id == id);
         }
         
-        // strefa smierci, ponizej nic nie dziala
         
-        /*TODO NAPRAWIC MAPOWANIE IDK CZEMU NIE ZNAJDUJE WIDOKU*/
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> ImportTrade(IFormFile file)
-        {
-            if (file != null && file.Length > 0)
-            {
-                var filePath = Path.GetTempFileName();
-                using (var stream = System.IO.File.Create(filePath))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                await _csvImporter.ImportCsvAsync(filePath);
-            }
-
-            return View();
-        }
-
-        /*Nie testowane - testowane - NIE DZIALA :)*/
-        public IActionResult ImportCSV(string filePath)
-        {
-            try
-            {
-                if (System.IO.File.Exists(filePath))
-                {
-
-                    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                    {
-                        HasHeaderRecord = true
-                    };
-                    using (StreamReader streamReader = new StreamReader(filePath))
-                    using (CsvReader csvReader = new CsvReader(streamReader, config))
-                    {
-
-                        // Read records from the CSV file
-                        IEnumerable<Trade> records = csvReader.GetRecords<Trade>();
-
-                        // Process each record
-                        foreach (Trade trade in records)
-                        {
-                            Console.WriteLine($"Id: {trade.Id}, Symbol: {trade.SymbolName}");
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-            return View();
-        }
-
 
 
     }

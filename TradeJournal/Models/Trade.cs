@@ -23,7 +23,6 @@ namespace TradeJournal.Models
         public float TradeOutcome { get; set; } // P/L
         public float PriceChange { get; set; } // (%)
 
-        //Relacja 
-        //public ICollection<Journal> ?Journals { get;} // chyba nie trzeba 
+      
     }
 }

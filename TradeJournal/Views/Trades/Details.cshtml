@@ -1,14 +1,12 @@
 ﻿@model TradeJournal.ViewModels.TradesJournalsViewModels
-        <!--model TradeJournal.ViewModels.TradesJournalsViewModels-->
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<!--Błąd jest tutaj, bo nie zwracamy bezpośrednio Trade, tylko model.Trade -->
 
 <h1>Details</h1>
-<div class="row ">
+<div>
     <div>
         <h4>Trade</h4>
         <hr />
@@ -88,7 +86,7 @@
         </dl>
     </div>
 
-    <div>
+    <div class="vw-80">
         @if (Model.Journal != null)
         {
             System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
