@@ -87,14 +87,14 @@ namespace TradeJournal.Controllers
                 else _context.Update(trade);
 
                 await _context.SaveChangesAsync();
-                return View(trade);
+                return RedirectToAction(nameof(Index));
 
             }
 
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             foreach (var error in errors)  System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
 
-            return View(trade);
+            return RedirectToAction(nameof(Details));
         }
 
 

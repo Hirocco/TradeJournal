@@ -60,11 +60,11 @@ namespace TradeJournal.Controllers
 
 
         // GET: Journals/AddOrEdit
-        public IActionResult AddOrEdit(int id = 0)
+        public IActionResult AddOrEdit(int tradeId, int id = 0)
         {
             // blad jest dlatego, bo nie tworzy sie nowy journal, tylko kpiuje id z trade i probje aktualizowac cos co nie istnieje
 
-            if (id == 0) return View(new Journal()); // Jeśli id jest 0, zwróć pusty model Journal do widoku
+            if (id == 0) return View(new Journal{ TradeId = tradeId }); // Jeśli id jest 0, zwróć pusty model Journal do widoku
 
             else
             {
@@ -87,7 +87,9 @@ namespace TradeJournal.Controllers
 
                 else _context.Update(journal); // Aktualizuj istniejący rekord
 
-                
+                Console.WriteLine(journal.Id); Console.WriteLine(journal.TradeId);
+
+
                 try { await _context.SaveChangesAsync(); } // Zapisz zmiany w bazie danych
                 catch (DbUpdateConcurrencyException dbException)
                 {
@@ -119,10 +121,7 @@ namespace TradeJournal.Controllers
                         }
                     }
                 }
-                
-
-               
-                return PartialView("AddOrEdit", journal);  // Przekieruj do Trades/Details/{Id}
+                return RedirectToAction("Details", "Trades", new { id = journal.TradeId });
             }
 
             // Logowanie błędów walidacji do debugowania
@@ -132,11 +131,12 @@ namespace TradeJournal.Controllers
                 System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
             }
 
-            return PartialView("AddOrEdit", journal);
+            return RedirectToAction("Details", "Trades");
+
         }
 
 
-     
+
 
         // POST: Journals/Delete/5
         [HttpPost, ActionName("Delete")]
