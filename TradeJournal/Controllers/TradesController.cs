@@ -91,7 +91,7 @@ namespace TradeJournal.Controllers
         public IActionResult AddOrEdit(int id=0)
         {
             // odpala sie 
-            if (id == 0) return View(new Trade());
+            if (id == 0) { return View(new Trade());  }
             else return View(_context.Trades.Find(id));
         }
 
@@ -100,6 +100,7 @@ namespace TradeJournal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit([Bind("Id,TransactionOpenDate,TransactionCloseDate,SymbolName,PositionType,PositionVolume,EntryPrice,StopLoss,TakeProfit,Comission,Swap,TradeOutcome,PriceChange")] Trade trade)
         {
+            
             if (ModelState.IsValid) 
             {
                 if(trade.Id == 0) _context.Add(trade);
