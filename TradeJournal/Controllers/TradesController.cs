@@ -48,10 +48,15 @@ namespace TradeJournal.Controllers
             if (trade == null) return NotFound();
      
             //podlaczanie notatki pod trade
-            var journal = new Journal
+            var journal = await _context.Journals.FirstOrDefaultAsync(j=>j.TradeId == trade.Id);
+            if (journal == null)
             {
-                TradeId = trade.Id
-            };
+                journal = new Journal
+                {
+                    TradeId = trade.Id,  
+                    Trade = trade        
+                };
+            }
 
             //tworzenie viewModelu
             var viewModel = new TradesJournalsViewModels

@@ -17,20 +17,18 @@
     };
 }
 
-
-<div class="row d-flex justify-content-center align-items-center ">
+<div class="row d-flex justify-content-center align-items-center w-100">
     <div class="col-md-7">
+
         <form asp-controller="Journals" asp-action="AddOrEdit"> <!--tu jest blad, przekeirowywuje zle, bo zamiast do journals to do trades-->
             <div asp-validation-summary="ModelOnly"  class="text-danger"></div>
             <input type="hidden" asp-for="Id" value="@(Model.Id == 0 ? "0" : Model.Id)" />
             <input type="hidden" asp-for="@Model.TradeId"/>
 
              <div class="mb-3 w-100">
-                <ejs-richtexteditor id="Text" >
+                <ejs-richtexteditor class="text-white" value="@Model.Text" id="Text" >
                     <e-richtexteditor-toolbarsettings  items="tools"></e-richtexteditor-toolbarsettings>
-                        <e-content-template>
-                            @(string.IsNullOrEmpty(Model.Text) ? string.Empty : Model.Text)
-                        </e-content-template>
+                        
                 </ejs-richtexteditor>
                 <span asp-validation-for="@Model.Text" class="text-danger"></span>
              </div>

@@ -43,7 +43,7 @@ namespace TradeJournal.Controllers
             var trade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == journal.TradeId);
 
 
-            if (journal == null)
+            if (journal == null || trade == null)
             {
                 return NotFound();
             }
@@ -54,7 +54,7 @@ namespace TradeJournal.Controllers
                 Journal = journal // Zakładamy, że Journal jest powiązany z Trade
             };
 
-            return PartialView("AddOrEdit", viewModel);
+            return View("~/Views/Trades/Details.cshtml", viewModel);
         }
 
 
@@ -83,10 +83,15 @@ namespace TradeJournal.Controllers
 
             if (ModelState.IsValid)
             {
-                if (journal.Id == 0)  _context.Add(journal);   // Dodaj nowy rekord
+                var existingJounral = await _context.Journals.FirstOrDefaultAsync(j => j.TradeId == journal.TradeId);
 
-                else _context.Update(journal); // Aktualizuj istniejący rekord
+                if (existingJounral == null) { _context.Add(journal); } // nowy rekord
 
+                else 
+                { 
+                    existingJounral.Text = journal.Text;
+                    _context.Update(existingJounral);
+                }
                 Console.WriteLine(journal.Id); Console.WriteLine(journal.TradeId);
 
 
@@ -134,9 +139,6 @@ namespace TradeJournal.Controllers
             return RedirectToAction("Details", "Trades");
 
         }
-
-
-
 
         // POST: Journals/Delete/5
         [HttpPost, ActionName("Delete")]

@@ -6,101 +6,103 @@
 
 
 <h1>Details</h1>
-<div>
-    <div>
-        <h4>Trade</h4>
-        <hr />
+<div class="row" style="height: 100vh;">
+    <!-- Pierwsza kolumna - Tabela -->
+    <div class="col-md-6" style="overflow-y: auto;">
         <dl class="row">
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.TransactionOpenDate)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.TransactionOpenDate)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.TransactionCloseDate)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.TransactionCloseDate)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.SymbolName)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.SymbolName)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.PositionType)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.PositionType)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.PositionVolume)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.PositionVolume)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.EntryPrice)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.EntryPrice)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.StopLoss)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.StopLoss)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.TakeProfit)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.TakeProfit)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.Comission)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.Comission)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.Swap)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.Swap)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.TradeOutcome)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.TradeOutcome)
             </dd>
-            <dt class = "col-sm-2">
+            <dt class="col-sm-4">
                 @Html.DisplayNameFor(model => model.Trade.PriceChange)
             </dt>
-            <dd class = "col-sm-10">
+            <dd class="col-sm-8">
                 @Html.DisplayFor(model => model.Trade.PriceChange)
             </dd>
         </dl>
     </div>
 
-    <div class="vw-80">
-        @if (Model.Journal != null)
-        {
-            System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
-            await Html.RenderPartialAsync("~/Views/Journals/AddOrEdit.cshtml", this.Model.Journal);
-        }
-        else
-        {
-            System.Diagnostics.Debug.WriteLine("Journal is null.");
-            <p>Journal data is not available or the model type is incorrect.</p>
-        }
+    <!-- Druga kolumna - Journal -->
+    <div class="col-md-6" style="overflow-y: auto;">
+        <div class="h-100 w-100">
+            @if (Model.Journal != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
+                await Html.RenderPartialAsync("~/Views/Journals/AddOrEdit.cshtml", this.Model.Journal);
+            }
+            else
+            {
+                <p>No journal data available.</p>
+            }
 
+        </div>
     </div>
 </div>
+
 <div>
-    <a asp-action="Edit" class="btn btn-success" asp-route-id="@Model?.Trade.Id">Edit</a> 
+    <a asp-action="AddOrEdit" class="btn btn-success" asp-route-id="@Model?.Trade.Id">Edit</a> 
     <a asp-action="Index" class="btn btn-success">Back to List</a>
 </div>
