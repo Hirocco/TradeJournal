@@ -113,7 +113,8 @@ namespace TradeJournal.Controllers
                }).ToList();
 
             // Etap 2: Przetwarzanie danych w celu zachowania ostatniego bilansu w dniach bez transakcji
-            cumulativeBalance = totalNetBalance.Last().NetBalance; // Zainicjuj kumulatywny bilans ostatnią wartością z poprzedniego etapu
+            if (totalNetBalance.Any()) cumulativeBalance = totalNetBalance.Last().NetBalance; // Zainicjuj kumulatywny bilans ostatnią wartością z poprzedniego etapu
+            else cumulativeBalance = 0; 
 
             ViewBag.SplineChartDataBalance = LastMonth
                .Select(day =>

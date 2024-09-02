@@ -36,7 +36,7 @@
                 <span asp-validation-for="PositionType" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <ejs-textbox id="PositionVolume" name="PositionVolume" floatLabelType="Auto"  placeholder="Position volume"></ejs-textbox>
+                <ejs-textbox id="PositionVolume" name="PositionVolume" floatLabelType="Auto" placeholder="Position volume"></ejs-textbox>
                 <span asp-validation-for="PositionVolume" class="text-danger"></span>
             </div>
 
@@ -46,12 +46,12 @@
             </div>
 
             <div class="mb-3">
-                <ejs-textbox id="StopLoss" name="StopLoss" floatLabelType="Auto"placeholder="SL"></ejs-textbox>
+                <ejs-textbox id="StopLoss" name="StopLoss" floatLabelType="Auto" placeholder="SL"></ejs-textbox>
                 <span asp-validation-for="StopLoss" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <ejs-textbox id="TakeProfit" name="TakeProfit" floatLabelType="Auto"  placeholder="TP"></ejs-textbox>
+                <ejs-textbox id="TakeProfit" name="TakeProfit" floatLabelType="Auto" placeholder="TP"></ejs-textbox>
                 <span asp-validation-for="TakeProfit" class="text-danger"></span>
             </div>
 
@@ -61,17 +61,17 @@
             </div>
 
             <div class="mb-3">
-                <ejs-textbox id="Swap" name="Swap" floatLabelType="Auto"  placeholder="Swap"></ejs-textbox>
+                <ejs-textbox id="Swap" name="Swap" floatLabelType="Auto" placeholder="Swap"></ejs-textbox>
                 <span asp-validation-for="Swap" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <ejs-textbox id="TradeOutcome" name="TradeOutcome" floatLabelType="Auto"  placeholder="TradeOutcome"></ejs-textbox>
+                <ejs-textbox id="TradeOutcome" name="TradeOutcome" floatLabelType="Auto" placeholder="TradeOutcome"></ejs-textbox>
                 <span asp-validation-for="TradeOutcome" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <ejs-textbox id="PriceChange" name="PriceChange" floatLabelType="Auto"  placeholder="Price change (%)"></ejs-textbox>
+                <ejs-textbox id="PriceChange" name="PriceChange" floatLabelType="Auto" placeholder="Price change (%)"></ejs-textbox>
                 <span asp-validation-for="PriceChange" class="text-danger"></span>
             </div>
             <div class="mb-3 d-flex justify-content-center align-content-center">
@@ -86,14 +86,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-
-<!--<form asp-action="ImportCsv" method="post" enctype="multipart/form-data">
-    <div>
-        <label for="file">Upload CSV file:</label>
-        <input type="file" name="file" />
-    </div>
-    <div>
-        <button type="submit">Import</button>
-    </div>
-</form>
--->

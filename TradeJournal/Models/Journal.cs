@@ -12,11 +12,7 @@ namespace TradeJournal.Models
         [Column(TypeName = "nvarchar(1000)")]
 
         public string Text { get; set; }
-        /*
-        public string Title { get; set; }
 
-        public byte[] Image { get; set; }
-        */
         // relacje 
         public int TradeId { get; set; }
         public Trade? Trade { get; set; }
