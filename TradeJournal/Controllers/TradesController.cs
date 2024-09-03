@@ -11,13 +11,14 @@ using TradeJournal.Data;
 using TradeJournal.Models;
 using CsvHelper.Configuration;
 using CsvHelper;
+using TradeJournal.ViewModels;
 
 namespace TradeJournal.Controllers
 {
     public class TradesController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly ImportTrade _csvImporter;
+        private readonly ImportTrade _csvImporter; // to do 
 
         public TradesController(AppDbContext context)
         {
@@ -32,60 +33,44 @@ namespace TradeJournal.Controllers
             return View(await _context.Trades.ToListAsync());
         }
 
-        // GET: Trades/Details/5
+
+        // GET: Trades/Details/{Id}
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                
-                return NotFound();
-            }
+            // nie znaleziono/istnieje id 
+            if (id == null) return NotFound();
+            
 
             var trade = await _context.Trades
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (trade == null)
-            {
-                return NotFound();
-            }
 
-            return View(trade);
-        }
-
-        /*Nie testowane*/
-        public IActionResult ImportCSV(string filePath)
-        {
-            try
+            //nie znaleziono trade
+            if (trade == null) return NotFound();
+     
+            //podlaczanie notatki pod trade
+            var journal = await _context.Journals.FirstOrDefaultAsync(j=>j.TradeId == trade.Id);
+            if (journal == null)
             {
-                if (System.IO.File.Exists(filePath))
+                journal = new Journal
                 {
-
-                    var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                    {
-                        HasHeaderRecord = true
-                    };
-                    using (StreamReader streamReader = new StreamReader(filePath))
-                    using (CsvReader csvReader = new CsvReader(streamReader, config))
-                    {
-
-                        // Read records from the CSV file
-                        IEnumerable<Trade> records = csvReader.GetRecords<Trade>();
-
-                        // Process each record
-                        foreach (Trade trade in records)
-                        {
-                            Console.WriteLine($"Id: {trade.Id}, Symbol: {trade.SymbolName}");
-                        }
-                    }
-                }
+                    TradeId = trade.Id,  
+                    Trade = trade        
+                };
             }
-            catch (Exception e)
+
+            //tworzenie viewModelu
+            var viewModel = new TradesJournalsViewModels
             {
-                throw;
-            }
-            return View();
+                Trade = trade,
+                Journal = journal
+            };
+
+            
+           //zwracamy oba
+            return View(viewModel);
         }
 
-       
+    
 
         // GET: Trades/AddOrEdit
         public IActionResult AddOrEdit(int id=0)
@@ -100,7 +85,7 @@ namespace TradeJournal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit([Bind("Id,TransactionOpenDate,TransactionCloseDate,SymbolName,PositionType,PositionVolume,EntryPrice,StopLoss,TakeProfit,Comission,Swap,TradeOutcome,PriceChange")] Trade trade)
         {
-            
+
             if (ModelState.IsValid) 
             {
                 if(trade.Id == 0) _context.Add(trade);
@@ -108,12 +93,13 @@ namespace TradeJournal.Controllers
 
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+
             }
-            
+
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             foreach (var error in errors)  System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
 
-            return View(trade);
+            return RedirectToAction(nameof(Details));
         }
 
 
@@ -137,27 +123,8 @@ namespace TradeJournal.Controllers
             return _context.Trades.Any(e => e.Id == id);
         }
         
+        
 
-
-        /*TODO NAPRAWIC MAPOWANIE IDK CZEMU NIE ZNAJDUJE WIDOKU*/
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> ImportTrade(IFormFile file)
-        {
-            if (file != null && file.Length > 0)
-            {
-                var filePath = Path.GetTempFileName();
-                using (var stream = System.IO.File.Create(filePath))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                await _csvImporter.ImportCsvAsync(filePath);
-            }
-
-            return View();
-        }
 
     }
 }
