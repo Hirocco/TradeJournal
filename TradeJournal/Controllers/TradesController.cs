@@ -99,7 +99,7 @@ namespace TradeJournal.Controllers
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             foreach (var error in errors)  System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
 
-            return RedirectToAction(nameof(Details));
+            return View(trade);
         }
 
 

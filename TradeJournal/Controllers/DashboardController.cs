@@ -82,7 +82,7 @@ namespace TradeJournal.Controllers
                 }).ToList();
 
             /*Wyswietlanie profitow i strat*/
-            ViewBag.SplineChartData = from day in LastMonth
+            ViewBag.SplineChartData = from day in LastWeek
                                       join profit in profitSummary on day equals profit.date into dayProfitJoined
                                       from profit in dayProfitJoined.DefaultIfEmpty()
                                       join loss in lossSummary on day equals loss.date into dayLossJoined
@@ -116,7 +116,7 @@ namespace TradeJournal.Controllers
             if (totalNetBalance.Any()) cumulativeBalance = totalNetBalance.Last().NetBalance; // Zainicjuj kumulatywny bilans ostatnią wartością z poprzedniego etapu
             else cumulativeBalance = 0; 
 
-            ViewBag.SplineChartDataBalance = LastMonth
+            ViewBag.SplineChartDataBalance = LastWeek
                .Select(day =>
                {
                    var balance = totalNetBalance.FirstOrDefault(b => b.Date == day);
