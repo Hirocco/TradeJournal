@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TradeJournal.Data;
 using TradeJournal.Models;
-using CsvHelper.Configuration;
-using CsvHelper;
 using TradeJournal.ViewModels;
 
 namespace TradeJournal.Controllers
@@ -18,12 +15,9 @@ namespace TradeJournal.Controllers
     public class TradesController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly ImportTrade _csvImporter; // to do 
-
         public TradesController(AppDbContext context)
         {
             _context = context;
-            _csvImporter = new ImportTrade(context);
 
         }
 
