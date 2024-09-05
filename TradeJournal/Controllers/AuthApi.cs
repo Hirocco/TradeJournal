@@ -5,13 +5,13 @@ using TradeJournal.Services.user;
 
 namespace TradeJournal.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class AuthApi : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public AuthApi(UserService userService)
+        public AuthApi(IUserService userService)
         {
             _userService = userService;
         }
@@ -38,9 +38,11 @@ namespace TradeJournal.Controllers
             catch (Exception e) { return Problem(e.Message); }
         }
 
+        // cos sie tutaj pierdoli
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
         {
+            Console.WriteLine("ODPALA");
             try
             {
                 var tokenDto = await _userService.RefreshTokenAsync(refreshToken);
@@ -48,6 +50,5 @@ namespace TradeJournal.Controllers
             }
             catch(UnauthorizedAccessException e) { return Unauthorized(e.Message); }
         }
-
     }
 }

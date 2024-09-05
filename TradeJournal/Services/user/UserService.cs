@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 using TradeJournal.Data;
 using TradeJournal.Models;
 using Microsoft.EntityFrameworkCore;
+using TradeJournal.Migrations;
 
 
 
@@ -38,9 +39,20 @@ namespace TradeJournal.Services.user
                     Password = hashedPassword
                 }
             };
+
             await _context.Users.AddAsync(newUser);
-            await _context.SaveChangesAsync();  
-            
+            await _context.SaveChangesAsync();
+
+            var tokenDto = _jwtTokenService.GenerateToken(newUser);
+            var token = new RefreshToken
+            {
+                TokenVal = tokenDto.Ref_Token,
+                RefreshTokenExpiresAt = DateTime.UtcNow.AddHours(1),    // REFRESH TOKEN CZAS 1H - Zrobie setup pozniej
+                AuthId = newUser.Auth.Id,
+            };
+            await _context.Tokens.AddAsync(token);
+            await _context.SaveChangesAsync();
+
         }
 
         public async Task<TokenDTO> LoginAsync(AuthDTO authDto)
@@ -66,28 +78,31 @@ namespace TradeJournal.Services.user
         }
         public async Task<TokenDTO> RefreshTokenAsync(string refreshToken)
         {
-            // podlaczamy token do auth, auth do usera i sprawdzamy wartosc tokenu
-            var token = await _context.Tokens.Include(t => t.Auth).ThenInclude(t => t.User).FirstOrDefaultAsync(t => t.TokenVal == refreshToken);
+            // Podłączamy token do auth, auth do usera i sprawdzamy wartość tokenu
+            var token = await _context.Tokens.Include(t => t.Auth).ThenInclude(a => a.User)
+                .FirstOrDefaultAsync(t => t.TokenVal == refreshToken);
 
-            if (token == null || token.RefreshTokenExpiresAt <= DateTime.UtcNow) throw new UnauthorizedAccessException("Refresh token expired");
+            if (token == null || token.RefreshTokenExpiresAt <= DateTime.UtcNow)
+                throw new UnauthorizedAccessException("Refresh token expired");
 
-            // podlaczam usera do auth, auth do tokenu i sprawdzam czy token nalezy do usera
-            var user = await _context.Users.Include(u => u.Auth).ThenInclude(u => u.RefreshToken).FirstOrDefaultAsync(u => u.Id == token.Auth.UserId);
-            if (user == null) throw new Exception("User not found - user service refresh token");
-            
-            // generujemy nowe dane do tokenu
+            var user = token.Auth.User; // Używamy użytkownika, który już został załadowany w poprzednim zapytaniu
+            if (user == null)
+                throw new Exception("User not found - user service refresh token");
+
+            // Generujemy nowe dane do tokenu
             var newTokenDto = _jwtTokenService.GenerateToken(user);
 
-            //przypisujemy do istniejacego tokenu
+            // Przypisujemy do istniejącego tokenu
             token.TokenVal = newTokenDto.Ref_Token;
             token.RefreshTokenExpiresAt = DateTime.UtcNow.AddHours(1);
-            
-            //idzie update do bazy
+
+            // Aktualizujemy token w bazie
             _context.Tokens.Update(token);
             await _context.SaveChangesAsync();
 
             return newTokenDto;
         }
+
 
     }
 }
