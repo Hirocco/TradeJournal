@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NuGet.Common;
 using TradeJournal.Models;
 
 namespace TradeJournal.Data
@@ -7,21 +8,26 @@ namespace TradeJournal.Data
     {
         public AppDbContext() { }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-        public DbSet<TradingAccount> TradingAccounts { get; set; }
         public DbSet<Trade> Trades { get; set; }
         public DbSet<Journal> Journals { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Auth> Auths { get; set; }
+        public DbSet<RefreshToken> Tokens { get; set; }
 
-        /*
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Trade>()
-                .HasMany(e => e.Journals)
-                .WithOne(e => e.Trade)
-                .HasForeignKey(e => e.TradeId)
-                .HasPrincipalKey(e => e.Id);
 
-        }*/
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Auth)
+                .WithOne(a => a.User)
+                .HasForeignKey<Auth>(a => a.UserId);
+
+            modelBuilder.Entity<Auth>()
+                .HasMany(a => a.RefreshToken)
+                .WithOne(t => t.Auth)
+                .HasForeignKey(t => t.AuthId);
+        }
     }
 }
