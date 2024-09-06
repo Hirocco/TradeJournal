@@ -23,6 +23,9 @@ namespace TradeJournal.Models
         public float TradeOutcome { get; set; } // P/L
         public float PriceChange { get; set; } // (%)
 
-      
+
+        public int UserId { get; set; }
+        public User User  { get; set; }
+
     }
 }

@@ -1,0 +1,34 @@
+﻿@model TradeJournal.Models.Auth
+
+@{
+    ViewData["PageTitle"] = "Login";
+}
+
+<h1>Login</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Login">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <ejs-textbox id="Email" name="Email" placeholder="E-mail" floatLabelType="Auto"></ejs-textbox>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="Password" name="Password" placeholder="Password" floatLabelType="Auto"></ejs-textbox>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 d-flex justify-content-center align-content-center">
+                <ejs-button cssClass="w-100" id="submit" type="submit" content="Login"></ejs-button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

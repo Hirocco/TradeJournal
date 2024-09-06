@@ -105,48 +105,22 @@ namespace TradeJournal.Services.user
             }
 
             /*Jeżeli token wygasł dodaj nowy*/
-            var existingToken2 = await _context.Tokens
-                .AsTracking() 
-                .FirstOrDefaultAsync(t => t.TokenVal == userToken.TokenVal);
-
-            if (existingToken2 == null) throw new Exception("Token not assigned, have you registered? ");
-
-            existingToken2.RefreshTokenExpiresAt = DateTime.Now.AddMinutes(2);
+            
             var tokenDto = _jwtTokenService.GenerateToken(user);
 
-            existingToken2.TokenVal = tokenDto.Ref_Token;
+            var newToken = new RefreshToken
+            {
+                TokenVal = tokenDto.Ref_Token,
+                AuthId = auth.Id,
+                RefreshTokenExpiresAt = DateTime.Now.AddMinutes(2)
+            };
+            
+            _context.Tokens.Add(newToken);
             await _context.SaveChangesAsync();
-            Console.WriteLine($"Login token: {existingToken2.TokenVal}");
+            Console.WriteLine($"Login token: {newToken.TokenVal}");
 
             return tokenDto;
         }
-        public async Task<TokenDTO> RefreshTokenAsync(string refreshToken)
-        {
-            // Podłączamy token do auth, auth do usera i sprawdzamy wartość tokenu
-            var token = await _context.Tokens.Include(t => t.Auth).ThenInclude(a => a.User)
-                .FirstOrDefaultAsync(t => t.TokenVal == refreshToken);
-
-            if (token == null || token.RefreshTokenExpiresAt <= DateTime.Now)
-                throw new UnauthorizedAccessException("Refresh token expired");
-
-            var user = token.Auth.User; // Używamy użytkownika, który już został załadowany w poprzednim zapytaniu
-            if (user == null)
-                throw new Exception("User not found - user service refresh token");
-
-            // Generujemy nowe dane do tokenu
-            var newTokenDto = _jwtTokenService.GenerateToken(user);
-
-            // Przypisujemy do istniejącego tokenu
-            token.TokenVal = newTokenDto.Ref_Token;
-            token.RefreshTokenExpiresAt = DateTime.Now.AddHours(1);
-
-            // Aktualizujemy token w bazie
-            _context.Tokens.Update(token);
-            await _context.SaveChangesAsync();
-
-            return newTokenDto;
-        }
-
 
     }
 }

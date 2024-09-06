@@ -1,0 +1,36 @@
+﻿@model TradeJournal.Models.User
+@{
+    ViewData["Title"] = "Register";
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Register">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <ejs-textbox id="Login" name="Login" placeholder="Login" floatLabelType="Auto"></ejs-textbox>
+                <span asp-validation-for="Login" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <ejs-textbox id="Email" name="Email" placeholder="E-mail" floatLabelType="Auto"></ejs-textbox>
+                <span asp-validation-for="@Model.Auth.Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <ejs-textbox id="Password" name="Password" placeholder="Password" floatLabelType="Auto"></ejs-textbox>
+                <span asp-validation-for="@Model.Auth.Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 d-flex justify-content-center align-content-center">
+                <ejs-button cssClass="w-100" id="submit" type="submit" content="Register"></ejs-button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

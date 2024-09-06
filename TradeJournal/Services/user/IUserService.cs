@@ -6,6 +6,5 @@ namespace TradeJournal.Services.user
     {
         Task<TokenDTO> LoginAsync(AuthDTO authDto);
         Task RegisterUserAsync(UserRegisterDTO userRegisterDto);
-        Task<TokenDTO> RefreshTokenAsync(string refreshToken);
     }
 }

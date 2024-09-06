@@ -13,7 +13,7 @@ namespace TradeJournal.Models
         public int UserId { get; set; }
         public User User { get; set; }
  
-        public ICollection<RefreshToken> RefreshToken { get; set; }
+        public List<RefreshToken> RefreshToken { get; set; }
 
     }
 }

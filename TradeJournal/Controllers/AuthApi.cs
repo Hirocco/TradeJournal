@@ -39,19 +39,7 @@ namespace TradeJournal.Controllers
             catch (Exception e) { return Problem(e.Message); }
         }
 
-        // ???
-        [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
-        {
-            Console.WriteLine("ODPALA");
-            try
-            {
-                
-                var tokenDto = await _userService.RefreshTokenAsync(refreshToken);
-                Console.WriteLine($"param: {refreshToken}   -   tokenDto: {tokenDto.Ref_Token}");
-                return Ok(tokenDto);
-            }
-            catch(UnauthorizedAccessException e) { return Unauthorized(e.Message); }
-        }
+
+        
     }
 }

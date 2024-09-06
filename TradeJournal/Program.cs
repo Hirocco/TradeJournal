@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileSystemGlobbing.Internal.Patterns;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TradeJournal.Data;
@@ -49,6 +50,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
@@ -74,4 +76,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
+// {controller=AuthsController}/{action=Login});
+// {controller=Dashboard}/{action=Index}/{id?}
 app.Run();
