@@ -4,6 +4,8 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using TradeJournal.Models;
+using TradeJournal.Data;
+using Microsoft.EntityFrameworkCore;
 namespace TradeJournal.Services.token
 {
     public class JwtService : IJwtTokenService
@@ -57,5 +59,6 @@ namespace TradeJournal.Services.token
             return new string(Enumerable.Repeat(chars, 35).Select(n => n[new Random().Next(n.Length)]).ToArray());
 
         }
+
     }
 }

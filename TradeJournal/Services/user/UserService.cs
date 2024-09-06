@@ -26,8 +26,12 @@ namespace TradeJournal.Services.user
 
         // login - register - refresh token 
 
+
+        /*hashowanie -> tworzenie obiektu user -> dodanie do BD*/
+        /*Generowanie tokenu -> tworzenie obiektu RefreshToken -> dodanie do BD*/
         public async Task RegisterUserAsync(UserRegisterDTO userRegisterDto)
         {
+
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userRegisterDto.Password);
 
             var newUser = new User
@@ -36,20 +40,27 @@ namespace TradeJournal.Services.user
                 Auth = new Auth
                 {
                     Email = userRegisterDto.Email,
-                    Password = hashedPassword
-                }
+                    Password = hashedPassword,
+                },
             };
+
+            // szybka walidacja
+            var email = await _context.Users.FirstOrDefaultAsync(u => u.Auth.Email == newUser.Auth.Email);
+            if (email != null) throw new Exception("Email already in use!");
 
             await _context.Users.AddAsync(newUser);
             await _context.SaveChangesAsync();
 
+            // tutaj token jest taki sam jak w BD
             var tokenDto = _jwtTokenService.GenerateToken(newUser);
             var token = new RefreshToken
             {
                 TokenVal = tokenDto.Ref_Token,
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddHours(1),    // REFRESH TOKEN CZAS 1H - Zrobie setup pozniej
+                RefreshTokenExpiresAt = DateTime.Now.AddMinutes(2),    // REFRESH TOKEN CZAS 1H - Zrobie setup pozniej
                 AuthId = newUser.Auth.Id,
             };
+            Console.WriteLine($"Register user token: {token.TokenVal}");
+            
             await _context.Tokens.AddAsync(token);
             await _context.SaveChangesAsync();
 
@@ -62,19 +73,52 @@ namespace TradeJournal.Services.user
 
             var user = await _context.Users.Include(u => u.Auth).FirstOrDefaultAsync(u => u.Auth.Email == authDto.Email);
             if (user == null) throw new Exception("User doesn't exist");
-            
-            var tokenDto = _jwtTokenService.GenerateToken(user);
-            var token = new RefreshToken
-            {
-                TokenVal = tokenDto.Ref_Token,
-                RefreshTokenExpiresAt = DateTime.UtcNow.AddHours(1),    // REFRESH TOKEN CZAS 1H - Zrobie setup pozniej
-                AuthId = auth.Id,
-            };
 
-            await _context.Tokens.AddAsync(token);
+            var userToken = await _context.Tokens.FirstOrDefaultAsync(t => t.AuthId == auth.Id && auth.Email == user.Auth.Email);
+            Console.WriteLine($"userToken: {userToken.TokenVal} {userToken.RefreshTokenExpiresAt} - przed utworzeniem nowego do sesji");
+            Console.WriteLine(DateTime.Now);
+
+            // Jeżeli token istnieje i jest nadal ważny to znajdź go i aktualizuj
+            if (userToken != null && userToken.RefreshTokenExpiresAt > DateTime.Now)
+            {
+
+                // Sprawdź, czy token jest już śledzony przez kontekst EF Core
+                var existingToken = await _context.Tokens
+                    .AsTracking() // Śledzenie tokenu, aby upewnić się, że aktualizacje są zapisywane
+                    .FirstOrDefaultAsync(t => t.TokenVal == userToken.TokenVal);
+
+                if (existingToken != null)
+                {
+                    // Zaktualizuj właściwości istniejącego tokenu
+                    existingToken.RefreshTokenExpiresAt = DateTime.Now.AddMinutes(2);  // przedłużenie o godzinę
+
+                    // Wygeneruj nowy token dostępu (access token)
+                    var updatedAccessToken = _jwtTokenService.GenerateToken(user);
+                    updatedAccessToken.Ref_Token = existingToken.TokenVal; // Pozostaw ten sam RefreshToken
+
+                    // Zapisz zmiany w bazie danych bez wywoływania `Update()`
+                    await _context.SaveChangesAsync();
+
+                    Console.WriteLine($"Acess token: {updatedAccessToken.A_Token}");
+                    return updatedAccessToken;
+                }
+            }
+
+            /*Jeżeli token wygasł dodaj nowy*/
+            var existingToken2 = await _context.Tokens
+                .AsTracking() 
+                .FirstOrDefaultAsync(t => t.TokenVal == userToken.TokenVal);
+
+            if (existingToken2 == null) throw new Exception("Token not assigned, have you registered? ");
+
+            existingToken2.RefreshTokenExpiresAt = DateTime.Now.AddMinutes(2);
+            var tokenDto = _jwtTokenService.GenerateToken(user);
+
+            existingToken2.TokenVal = tokenDto.Ref_Token;
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"Login token: {existingToken2.TokenVal}");
 
             return tokenDto;
-
         }
         public async Task<TokenDTO> RefreshTokenAsync(string refreshToken)
         {
@@ -82,7 +126,7 @@ namespace TradeJournal.Services.user
             var token = await _context.Tokens.Include(t => t.Auth).ThenInclude(a => a.User)
                 .FirstOrDefaultAsync(t => t.TokenVal == refreshToken);
 
-            if (token == null || token.RefreshTokenExpiresAt <= DateTime.UtcNow)
+            if (token == null || token.RefreshTokenExpiresAt <= DateTime.Now)
                 throw new UnauthorizedAccessException("Refresh token expired");
 
             var user = token.Auth.User; // Używamy użytkownika, który już został załadowany w poprzednim zapytaniu
@@ -94,7 +138,7 @@ namespace TradeJournal.Services.user
 
             // Przypisujemy do istniejącego tokenu
             token.TokenVal = newTokenDto.Ref_Token;
-            token.RefreshTokenExpiresAt = DateTime.UtcNow.AddHours(1);
+            token.RefreshTokenExpiresAt = DateTime.Now.AddHours(1);
 
             // Aktualizujemy token w bazie
             _context.Tokens.Update(token);

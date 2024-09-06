@@ -7,7 +7,7 @@ namespace TradeJournal.Models
         public int Id { get; set; }
         public string TokenVal { get; set; }
         public DateTime RefreshTokenExpiresAt { get; set; }
-        public DateTime RefreshTokenCreatedAt   { get; set; }
+        public DateTime RefreshTokenCreatedAt = DateTime.Now;
 
         public int AuthId { get; set; }
         public Auth Auth {  get; set; }
