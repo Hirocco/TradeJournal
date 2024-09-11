@@ -8,6 +8,8 @@ using TradeJournal.Data;
 using TradeJournal.Models;
 using Microsoft.EntityFrameworkCore;
 using TradeJournal.Migrations;
+using Microsoft.AspNetCore.Mvc;
+using TradeJournal.Services.session;
 
 
 
@@ -16,12 +18,14 @@ namespace TradeJournal.Services.user
     public class UserService : IUserService
     {
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly ISessionService _sessionService;
         private readonly AppDbContext _context;
 
-        public UserService(IJwtTokenService jwtTokenService, AppDbContext context)
+        public UserService(IJwtTokenService jwtTokenService, AppDbContext context, ISessionService sessionService)
         {
             _context = context;
             _jwtTokenService = jwtTokenService;
+            _sessionService = sessionService;
         }
 
         // login - register - refresh token 
@@ -61,6 +65,8 @@ namespace TradeJournal.Services.user
             };
             Console.WriteLine($"Register user token: {token.TokenVal}");
             
+            
+
             await _context.Tokens.AddAsync(token);
             await _context.SaveChangesAsync();
 
@@ -75,8 +81,7 @@ namespace TradeJournal.Services.user
             if (user == null) throw new Exception("User doesn't exist");
 
             var userToken = await _context.Tokens.FirstOrDefaultAsync(t => t.AuthId == auth.Id && auth.Email == user.Auth.Email);
-            Console.WriteLine($"userToken: {userToken.TokenVal} {userToken.RefreshTokenExpiresAt} - przed utworzeniem nowego do sesji");
-            Console.WriteLine(DateTime.Now);
+
 
             // Jeżeli token istnieje i jest nadal ważny to znajdź go i aktualizuj
             if (userToken != null && userToken.RefreshTokenExpiresAt > DateTime.Now)
@@ -98,6 +103,9 @@ namespace TradeJournal.Services.user
 
                     // Zapisz zmiany w bazie danych bez wywoływania `Update()`
                     await _context.SaveChangesAsync();
+                    await _sessionService.InitializeSessionAsync(user.Id, updatedAccessToken.Ref_Token);
+
+
 
                     Console.WriteLine($"Acess token: {updatedAccessToken.A_Token}");
                     return updatedAccessToken;
@@ -117,10 +125,66 @@ namespace TradeJournal.Services.user
             
             _context.Tokens.Add(newToken);
             await _context.SaveChangesAsync();
+            await _sessionService.InitializeSessionAsync(user.Id, tokenDto.Ref_Token);
+            Console.WriteLine($"Sesja aktywna: {await _sessionService.IsSessionActiveAsync()}");
+
             Console.WriteLine($"Login token: {newToken.TokenVal}");
 
             return tokenDto;
         }
+
+        public async Task RefreshToken(string refTokenVal)
+        {
+            var currUser = await _context.Users
+                .Include(u => u.Auth)
+                .ThenInclude(a => a.RefreshToken)
+                .FirstOrDefaultAsync(u => u.Auth.RefreshToken.Any(rt => rt.TokenVal == refTokenVal));
+
+
+            if (currUser == null) throw new Exception("User not found - refresh token exeption");
+
+            var auth = await _context.Auths.FirstOrDefaultAsync(a => a.UserId == currUser.Id);
+            if (auth == null) throw new Exception("Auth for user not found - refresh token exeption");
+
+            var userToken = await _context.Tokens.FirstOrDefaultAsync(t => t.AuthId == auth.Id);
+            if (userToken != null && userToken.RefreshTokenExpiresAt > DateTime.Now)
+            {
+
+                // Sprawdź, czy token jest już śledzony przez kontekst EF Core
+                var existingToken = await _context.Tokens
+                    .AsTracking() // Śledzenie tokenu, aby upewnić się, że aktualizacje są zapisywane
+                    .FirstOrDefaultAsync(t => t.TokenVal == userToken.TokenVal);
+
+                if (existingToken != null)
+                {
+                    // Zaktualizuj właściwości istniejącego tokenu
+                    existingToken.RefreshTokenExpiresAt = DateTime.Now.AddMinutes(2);  // przedłużenie o godzinę
+
+                    // Wygeneruj nowy token dostępu (access token)
+                    var updatedAccessToken = _jwtTokenService.GenerateToken(currUser);
+                    updatedAccessToken.Ref_Token = existingToken.TokenVal; // Pozostaw ten sam RefreshToken
+
+                    // Zapisz zmiany w bazie danych bez wywoływania `Update()`
+                    await _context.SaveChangesAsync();
+
+                    Console.WriteLine($"Acess token: {updatedAccessToken.A_Token}");
+                }
+            }
+            else throw new Exception("Token expired");
+
+        }
+
+        public async Task<UserDTO> GetCurrentUser()
+        {
+            var userId = await _sessionService.GetUserIdAsync();
+            var currentUser = await _context.Users.FindAsync(userId);
+            return new UserDTO
+            {
+                Id = currentUser.Id,
+                Login = currentUser.Login,
+            };
+        }
+        
 
     }
 }

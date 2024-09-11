@@ -18,8 +18,7 @@
 }
 
 <div class="row d-flex justify-content-center align-items-center w-100">
-    <div class="col-md-7 vw-100">
-
+    <div class="col-md-7 vw-100 vh-100">
         <form asp-controller="Journals" asp-action="AddOrEdit"> <!--tu jest blad, przekeirowywuje zle, bo zamiast do journals to do trades-->
             <div asp-validation-summary="ModelOnly"  class="text-danger"></div>
             <input type="hidden" asp-for="Id" value="@(Model.Id == 0 ? "0" : Model.Id)" />

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
@@ -10,6 +11,7 @@ namespace TradeJournal.Controllers
     public class DashboardController : Controller
     {
         private readonly AppDbContext _appDbContext;
+
         public DashboardController(AppDbContext context)
         {
             _appDbContext = context;

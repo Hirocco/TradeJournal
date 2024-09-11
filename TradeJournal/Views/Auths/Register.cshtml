@@ -19,7 +19,7 @@
             </div>
 
             <div class="mb-3">
-                <ejs-textbox id="Password" name="Password" placeholder="Password" floatLabelType="Auto"></ejs-textbox>
+                <ejs-textbox id="Password" type="password" name="Password" placeholder="Password" floatLabelType="Auto"></ejs-textbox>
                 <span asp-validation-for="@Model.Auth.Password" class="text-danger"></span>
             </div>
 
@@ -28,6 +28,10 @@
             </div>
         </form>
     </div>
+    <div>
+        <a asp-action="Login">Login</a>
+    </div>
+
 </div>
 
 

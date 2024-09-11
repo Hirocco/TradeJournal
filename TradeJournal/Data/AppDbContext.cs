@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using NuGet.Common;
 using TradeJournal.Models;
 
@@ -13,7 +14,6 @@ namespace TradeJournal.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Auth> Auths { get; set; }
         public DbSet<RefreshToken> Tokens { get; set; }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

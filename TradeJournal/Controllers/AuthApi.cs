@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TradeJournal.Data.DTOs;
+using TradeJournal.Services.session;
 using TradeJournal.Services.user;
 
 namespace TradeJournal.Controllers
@@ -10,10 +11,12 @@ namespace TradeJournal.Controllers
     public class AuthApi : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ISessionService _sessionService;
 
-        public AuthApi(IUserService userService)
+        public AuthApi(IUserService userService, ISessionService sessionService)
         {
             _userService = userService;
+            _sessionService = sessionService;
         }
 
         [HttpPost("login")]
@@ -39,7 +42,13 @@ namespace TradeJournal.Controllers
             catch (Exception e) { return Problem(e.Message); }
         }
 
-
-        
+        [HttpPost("refreshToken")]
+        public async Task RefreshToken([FromBody] string tokenVal)
+        {
+            try
+            {
+                await _userService.RefreshToken(tokenVal);
+            }catch(Exception e) { throw new Exception(e.Message); }
+        }
     }
 }
