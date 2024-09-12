@@ -38,59 +38,25 @@ namespace TradeJournal.Controllers
             Console.WriteLine($"HttpPost Login: {auth.Email} , {auth.Password}");
             if (ModelState.IsValid)
             {
-                var apiCallUrl = "https://localhost:7098/api/login";
-
-                // Serializuj dane z formularza do formatu JSON
-                var jsonContent = JsonSerializer.Serialize(new
-                {
-                    Email = auth.Email,
-                    Password = auth.Password
-                });
-                
-               // Tworzymy zawartość żądania HTTP
-               var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-                // Wykonujemy żądanie POST do API
-                //var response = await _httpClient.PostAsync(apiCallUrl, content);
-                var temp = new AuthDTO
-                {
-                    Email = auth.Email,
-                    Password = auth.Password
-                };
-
                 try
                 {
-                    var tokenDto = await _userService.LoginAsync(temp);
-                    HttpContext.Session.SetString("key", "abcdefg");
+                    var tokenDto = await _userService.LoginAsync(new AuthDTO
+                    {
+                        Email = auth.Email,
+                        Password = auth.Password
+                    });
+                    //HttpContext.Session.SetString("key", "abcdefg");
 
                     return View("~/Views/Dashboard/Index.cshtml");
                 }
-                catch (UnauthorizedAccessException e) {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    //Unauthorized(e.Message); 
-                }
-
-                /*
-                //Console.WriteLine($"Dane: {jsonContent} - {content} - {response}");
-                // Sprawdzamy, czy żądanie zakończyło się sukcesem
-                if (log.)
+                catch (UnauthorizedAccessException e)
                 {
-                    var tokenJson = await response.Content.ReadAsStringAsync();
-                    var token = JsonSerializer.Deserialize<TokenDTO>(tokenJson);
-
-                    HttpContext.Session.SetString("key", "abcdefg");
-
-                    return View("~/Views/Dashboard/Index.cshtml");
-                }
-                else
-                {
-                    // Obsługa błędu
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                }*/
+                    throw new Exception(e.Message);
+                }
             }
-
-            // Jeśli niepowodzenie, zwróć widok login z błędami
-            return View(nameof(Login));
+                // Jeśli niepowodzenie, zwróć widok login z błędami
+                return View(nameof(Login));     
         }
 
         public IActionResult Register() { return View(); }
@@ -102,20 +68,20 @@ namespace TradeJournal.Controllers
 
             if(ModelState.IsValid)
             {
-                var apiCallUrl = "https://localhost:7098/api/register";
-                var jsonContent = JsonSerializer.Serialize(new
+                try
                 {
-                    Login = userRegister.Login,
-                    Email = userRegister.Email,
-                    Password = userRegister.Password,
-                });
-                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(apiCallUrl, content);
-
-                Console.WriteLine($"Dane register: {jsonContent} - {content} - {response}");
-
-                if (response.IsSuccessStatusCode)   return View(nameof(Login));
-                else ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    await _userService.RegisterUserAsync(new UserRegisterDTO
+                    {
+                        Login = userRegister.Login,
+                        Email = userRegister.Email,
+                        Password = userRegister.Password
+                    });
+                }
+                catch(Exception e)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    throw new Exception(e.Message);
+                }
 
             }
             return View(nameof(Register));
