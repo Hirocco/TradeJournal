@@ -5,21 +5,24 @@ using System;
 using System.Globalization;
 using TradeJournal.Data;
 using TradeJournal.Models;
+using TradeJournal.Services.session;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace TradeJournal.Controllers
 {
     public class DashboardController : Controller
     {
         private readonly AppDbContext _appDbContext;
+        private readonly ISessionService _sessionService;
 
-        public DashboardController(AppDbContext context)
+        public DashboardController(AppDbContext context, ISessionService sessionService)
         {
             _appDbContext = context;
+            _sessionService = sessionService;
         }
         public async Task<ActionResult> Index()
         {
 
-
+            Console.WriteLine($"Sesja aktywna dashboard: {await _sessionService.IsSessionActiveAsync()}");
             // wszystkie trade
             List<Trade> selectedTrades = await _appDbContext.Trades.ToListAsync();
 

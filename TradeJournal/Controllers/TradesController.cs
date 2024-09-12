@@ -92,6 +92,7 @@ namespace TradeJournal.Controllers
         public async Task<IActionResult> AddOrEdit([Bind("Id,UserId,TransactionOpenDate,TransactionCloseDate,SymbolName,PositionType,PositionVolume,EntryPrice,StopLoss,TakeProfit,Comission,Swap,TradeOutcome,PriceChange")] Trade trade)
         {
             Console.WriteLine($"Sesja aktywna: {await _sessionService.IsSessionActiveAsync()}");
+            HttpContext.Session.TryGetValue("key", out var key);
             var currentUser = await _userService.GetCurrentUser();
 
             if (ModelState.IsValid) 

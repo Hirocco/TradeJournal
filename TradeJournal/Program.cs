@@ -20,6 +20,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
 
 // SESJA
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -30,14 +31,10 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // LICENCJA SYNCFUSION
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mgo+DSMBaFt5QHFqVkNrXVNbdV5dVGpAd0N3RGlcdlR1fUUmHVdTRHRbQlVjQX5Uc0JiUHpaeHc=;Mgo+DSMBPh8sVXJyS0d+X1RPd11dXmJWd1p/THNYflR1fV9DaUwxOX1dQl9nSXZTfkVkXHhfeXFTQmA=;Mgo+DSMBMAY9C3t2U1hhQlJBfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX5bdk1jXnpZcX1QQGRc;MzQyMzA3NUAzMjM2MmUzMDJlMzBPb3F5bU10SHhja2R4L0pqOGtkOFVWdnhBbitTQzd0bTBnaTBEUTRmUmRFPQ==");
 
-// IDENTITY
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>();
 
 // SERVICE
 builder.Services.AddScoped<IUserService, UserService>();
@@ -82,7 +79,6 @@ if (!app.Environment.IsDevelopment())
 
 // Kolejnoœæ middleware
 app.UseRouting();
-app.UseSession(); // <-- Sesja musi byæ przed autoryzacj¹ i autentykacj¹
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -91,6 +87,8 @@ app.UseCookiePolicy();
 
 app.UseAuthentication(); // <-- Musi byæ przed autoryzacj¹
 app.UseAuthorization();
+app.UseSession(); 
+
 
 app.MapRazorPages();
 app.MapControllerRoute(
