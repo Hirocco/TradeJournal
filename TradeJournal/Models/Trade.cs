@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TradeJournal.Data.Base;
 using TradeJournal.Data;
+using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
+
 
 namespace TradeJournal.Models
 {
@@ -23,6 +26,12 @@ namespace TradeJournal.Models
         public float TradeOutcome { get; set; } // P/L
         public float PriceChange { get; set; } // (%)
 
-      
+
+        public int UserId { get; set; }
+
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public User? User  { get; set; }
+
     }
 }

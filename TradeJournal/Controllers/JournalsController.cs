@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -62,14 +63,11 @@ namespace TradeJournal.Controllers
         // GET: Journals/AddOrEdit
         public IActionResult AddOrEdit(int tradeId, int id = 0)
         {
-            // blad jest dlatego, bo nie tworzy sie nowy journal, tylko kpiuje id z trade i probje aktualizowac cos co nie istnieje
-
-            if (id == 0) return View(new Journal{ TradeId = tradeId }); // Jeśli id jest 0, zwróć pusty model Journal do widoku
-
+            if (id == 0) return View(new Journal{ TradeId = tradeId }); 
             else
             {
                 var journal = _context.Journals.FirstOrDefault(j => j.Id == id);
-                if (journal == null) return NotFound(); // Jeśli id jest różne od 0, znajdź istniejący wpis w bazie danych
+                if (journal == null) return NotFound(); 
 
                 return PartialView("AddOrEdit", journal);
             }

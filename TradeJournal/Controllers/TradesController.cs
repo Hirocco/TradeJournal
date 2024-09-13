@@ -1,13 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TradeJournal.Data;
 using TradeJournal.Models;
+using TradeJournal.Services.session;
+using TradeJournal.Services.user;
 using TradeJournal.ViewModels;
 
 namespace TradeJournal.Controllers
@@ -15,28 +18,38 @@ namespace TradeJournal.Controllers
     public class TradesController : Controller
     {
         private readonly AppDbContext _context;
-        public TradesController(AppDbContext context)
+        private readonly IUserService _userService;
+        private readonly ISessionService _sessionService;
+        public TradesController(AppDbContext context, IUserService userService, ISessionService sessionService)
         {
             _context = context;
-
+            _userService = userService;
+            _sessionService = sessionService;
         }
 
         // GET: Trades
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Trades.ToListAsync());
+            var currentUser = await _userService.GetCurrentUser();
+            var trades = await _context.Trades
+                .Where(t => t.UserId == currentUser.Id) // Filtruj tylko transakcje zalogowanego użytkownika
+                .ToListAsync();
+
+            return View(trades);
         }
 
 
         // GET: Trades/Details/{Id}
         public async Task<IActionResult> Details(int? id)
         {
+            
+            var currentUser = await _userService.GetCurrentUser();
             // nie znaleziono/istnieje id 
             if (id == null) return NotFound();
-            
+
 
             var trade = await _context.Trades
-                .FirstOrDefaultAsync(m => m.Id == id);
+               .FirstOrDefaultAsync(m => m.Id == id && m.UserId == currentUser.Id); // Upewnij się, że transakcja należy do zalogowanego użytkownika
 
             //nie znaleziono trade
             if (trade == null) return NotFound();
@@ -69,8 +82,7 @@ namespace TradeJournal.Controllers
         // GET: Trades/AddOrEdit
         public IActionResult AddOrEdit(int id=0)
         {
-            // odpala sie 
-            if (id == 0) { return View(new Trade());  }
+            if (id == 0) return View(new Trade());
             else return View(_context.Trades.Find(id));
         }
 
@@ -79,19 +91,30 @@ namespace TradeJournal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit([Bind("Id,TransactionOpenDate,TransactionCloseDate,SymbolName,PositionType,PositionVolume,EntryPrice,StopLoss,TakeProfit,Comission,Swap,TradeOutcome,PriceChange")] Trade trade)
         {
+            Console.WriteLine($"Sesja aktywna trade: {await _sessionService.IsSessionActiveAsync()}");
+            var currentUser = await _userService.GetCurrentUser();
+            trade.UserId = (currentUser.Id);
 
-            if (ModelState.IsValid) 
+            Console.WriteLine($"{trade.Id} {trade.SymbolName} {trade.UserId}");
+
+            if (ModelState.IsValid) // to false jest
             {
-                if(trade.Id == 0) _context.Add(trade);
+                if (trade.Id == 0)
+                {
+                    _context.Add(trade);
+                }
                 else _context.Update(trade);
 
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
 
             }
+            
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                Console.WriteLine($"Error: {error.ErrorMessage}");
+            }
 
-            var errors = ModelState.Values.SelectMany(v => v.Errors);
-            foreach (var error in errors)  System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
 
             return View(trade);
         }
@@ -103,7 +126,9 @@ namespace TradeJournal.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var trade = await _context.Trades.FindAsync(id);
-            if (trade != null)
+            var currentUser = await _userService.GetCurrentUser();
+
+            if (trade != null && trade.UserId == currentUser.Id)
             {
                 _context.Trades.Remove(trade);
             }
@@ -111,14 +136,6 @@ namespace TradeJournal.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-        private bool TradeExists(int id)
-        {
-            return _context.Trades.Any(e => e.Id == id);
-        }
-        
-        
-
 
     }
 }

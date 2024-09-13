@@ -11,7 +11,7 @@
     menuItems.Add(new
     {
         text = "Dashboard",
-        url = "/",
+        url = "/Dashboard/Index",
         iconCss = "fa-solid fa-box", 
     });
     menuItems.Add(new
@@ -21,7 +21,8 @@
         items = new List<Object>() 
         {
             new {text = "Add", url="/Trades/AddOrEdit"},
-            new {text = "Trades details", url="/Trades"},        }
+            new {text = "Trades details", url="/Trades/Index"},      
+        }
     });
     menuItems.Add(new
     {
@@ -29,9 +30,15 @@
         iconCss = "fa-solid fa-user-alt",
         items = new List<Object>() 
         {
-            new {text = "Add"},
             new {text = "Account details"},
-            new {text = "Sum accounts"}
+            new {text = "Generate metrics"},
+            new 
+            {
+                text = "Logout",
+                iconCss = "fa-solid fa-sign-out-alt",
+                url = "javascript:submitLogoutForm();", 
+
+            }
         }
     });
     menuItems.Add(new
@@ -70,11 +77,16 @@
                 <span class="text-muted">YOUR NAME</span>
             </div>
         </div>
+
+
+        <form id="logoutForm" action="/Auths/Logout" method="post" style="display:none;">
+            @Html.AntiForgeryToken()  
+        </form>
         <ejs-menu id="menu" orientation="Vertical" items="menuItems" hamburgerMode>
             
         </ejs-menu>
+
     </e-content-template>
-   
 </ejs-sidebar>
 
 <script  type="text/javascript">
@@ -85,4 +97,10 @@
         };
     });
 
+</script>
+
+<script>
+    function submitLogoutForm() {
+        document.getElementById('logoutForm').submit(); // Wywołanie formularza
+    }
 </script>

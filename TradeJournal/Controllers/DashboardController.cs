@@ -1,25 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Globalization;
 using TradeJournal.Data;
 using TradeJournal.Models;
+using TradeJournal.Services.session;
+using TradeJournal.Services.user;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace TradeJournal.Controllers
 {
     public class DashboardController : Controller
     {
-        private readonly AppDbContext _appDbContext;
-        public DashboardController(AppDbContext context)
+        private readonly AppDbContext _context;
+        private readonly ISessionService _sessionService;
+        private readonly IUserService _userService;
+
+        public DashboardController(AppDbContext context, ISessionService sessionService, IUserService userService)
         {
-            _appDbContext = context;
+            _context = context;
+            _sessionService = sessionService;
+            _userService = userService;
         }
         public async Task<ActionResult> Index()
         {
+            var currentUser = await _userService.GetCurrentUser();
 
 
-            // wszystkie trade
-            List<Trade> selectedTrades = await _appDbContext.Trades.ToListAsync();
+            //trade uzytkownika
+            List<Trade> selectedTrades = await _context.Trades.Where(t => t.UserId == currentUser.Id).ToListAsync();
+
 
             // total swaps + commisions 
             float totalSwapComissions = selectedTrades.Sum(t => (t.Comission + t.Swap));
@@ -82,7 +92,7 @@ namespace TradeJournal.Controllers
                 }).ToList();
 
             /*Wyswietlanie profitow i strat*/
-            ViewBag.SplineChartData = from day in LastWeek
+            ViewBag.SplineChartData = from day in LastMonth
                                       join profit in profitSummary on day equals profit.date into dayProfitJoined
                                       from profit in dayProfitJoined.DefaultIfEmpty()
                                       join loss in lossSummary on day equals loss.date into dayLossJoined
@@ -116,7 +126,7 @@ namespace TradeJournal.Controllers
             if (totalNetBalance.Any()) cumulativeBalance = totalNetBalance.Last().NetBalance; // Zainicjuj kumulatywny bilans ostatnią wartością z poprzedniego etapu
             else cumulativeBalance = 0; 
 
-            ViewBag.SplineChartDataBalance = LastWeek
+            ViewBag.SplineChartDataBalance = LastMonth
                .Select(day =>
                {
                    var balance = totalNetBalance.FirstOrDefault(b => b.Date == day);
@@ -138,7 +148,8 @@ namespace TradeJournal.Controllers
 
 
             //recent trades
-            ViewBag.recentTrades = await _appDbContext.Trades
+            ViewBag.recentTrades = await _context.Trades
+               .Where(t => t.UserId == currentUser.Id)
                .OrderByDescending(j => j.TradeAdded)
                .Take(5)
                .ToListAsync();
