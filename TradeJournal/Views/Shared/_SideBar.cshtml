@@ -30,9 +30,15 @@
         iconCss = "fa-solid fa-user-alt",
         items = new List<Object>() 
         {
-            new {text = "Add"},
             new {text = "Account details"},
-            new {text = "Sum accounts"}
+            new {text = "Generate metrics"},
+            new 
+            {
+                text = "Logout",
+                iconCss = "fa-solid fa-sign-out-alt",
+                url = "javascript:document.getElementById('logoutForm').submit();",
+                type = "submit"
+            }
         }
     });
     menuItems.Add(new
@@ -74,8 +80,12 @@
         <ejs-menu id="menu" orientation="Vertical" items="menuItems" hamburgerMode>
             
         </ejs-menu>
+
+        <form id="logoutForm" action="Auths/Logout" method="post" style="display:none;">
+            @Html.AntiForgeryToken()
+        </form>
+
     </e-content-template>
-   
 </ejs-sidebar>
 
 <script  type="text/javascript">
@@ -86,4 +96,10 @@
         };
     });
 
+</script>
+
+<script>
+    function submitLogoutForm() {
+        document.getElementById('logoutForm').submit();
+    }
 </script>

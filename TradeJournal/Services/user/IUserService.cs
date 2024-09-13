@@ -9,5 +9,7 @@ namespace TradeJournal.Services.user
         Task RefreshToken(string refTokenVal);
 
         Task<UserDTO> GetCurrentUser();
+
+        Task Logout();
     }
 }

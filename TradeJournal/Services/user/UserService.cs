@@ -184,7 +184,11 @@ namespace TradeJournal.Services.user
                 Login = currentUser.Login,
             };
         }
-        
+
+        public async Task Logout()
+        {
+            _sessionService.ClearSessionAsync();
+        }
 
     }
 }

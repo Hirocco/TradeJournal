@@ -14,6 +14,7 @@ using System.Text;
 using System.Text.Json;
 using TradeJournal.Services.user;
 using Azure;
+using Microsoft.AspNetCore.Authentication;
 
 namespace TradeJournal.Controllers
 {
@@ -74,6 +75,7 @@ namespace TradeJournal.Controllers
                         Email = userRegister.Email,
                         Password = userRegister.Password
                     });
+                    return View(nameof(Login));
                 }
                 catch(Exception e)
                 {
@@ -84,6 +86,13 @@ namespace TradeJournal.Controllers
             }
             return View(nameof(Register));
 
+        }
+
+        [HttpPost, ActionName("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            _userService.Logout();
+            return RedirectToAction("Login", "Auths");
         }
 
     }
