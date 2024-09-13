@@ -36,8 +36,8 @@
             {
                 text = "Logout",
                 iconCss = "fa-solid fa-sign-out-alt",
-                url = "javascript:document.getElementById('logoutForm').submit();",
-                type = "submit"
+                url = "javascript:submitLogoutForm();", 
+
             }
         }
     });
@@ -77,13 +77,14 @@
                 <span class="text-muted">YOUR NAME</span>
             </div>
         </div>
+
+
+        <form id="logoutForm" action="/Auths/Logout" method="post" style="display:none;">
+            @Html.AntiForgeryToken()  
+        </form>
         <ejs-menu id="menu" orientation="Vertical" items="menuItems" hamburgerMode>
             
         </ejs-menu>
-
-        <form id="logoutForm" action="Auths/Logout" method="post" style="display:none;">
-            @Html.AntiForgeryToken()
-        </form>
 
     </e-content-template>
 </ejs-sidebar>
@@ -100,6 +101,6 @@
 
 <script>
     function submitLogoutForm() {
-        document.getElementById('logoutForm').submit();
+        document.getElementById('logoutForm').submit(); // Wywołanie formularza
     }
 </script>
