@@ -11,7 +11,7 @@
     menuItems.Add(new
     {
         text = "Dashboard",
-        url = "/",
+        url = "/Dashboard/Index",
         iconCss = "fa-solid fa-box", 
     });
     menuItems.Add(new
@@ -21,7 +21,8 @@
         items = new List<Object>() 
         {
             new {text = "Add", url="/Trades/AddOrEdit"},
-            new {text = "Trades details", url="/Trades"},        }
+            new {text = "Trades details", url="/Trades/Index"},      
+        }
     });
     menuItems.Add(new
     {

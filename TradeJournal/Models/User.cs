@@ -1,4 +1,6 @@
-﻿using TradeJournal.Data.Base;
+﻿using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
+using TradeJournal.Data.Base;
 
 namespace TradeJournal.Models
 {
@@ -8,6 +10,9 @@ namespace TradeJournal.Models
         public string Login { get; set; }
         public int AuthId {  get; set; }
         public Auth Auth { get; set; }
-        public List<Trade> Trades { get; set; }
+
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public List<Trade> Trades { get; set; } = new List<Trade>();
     }
 }

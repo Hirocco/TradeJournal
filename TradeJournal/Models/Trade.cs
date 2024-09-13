@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TradeJournal.Data.Base;
 using TradeJournal.Data;
+using System.Text.Json.Serialization;
+using System.Runtime.Serialization;
+
 
 namespace TradeJournal.Models
 {
@@ -25,7 +28,10 @@ namespace TradeJournal.Models
 
 
         public int UserId { get; set; }
-        public User User  { get; set; }
+
+        [JsonIgnore]
+        [IgnoreDataMember]
+        public User? User  { get; set; }
 
     }
 }

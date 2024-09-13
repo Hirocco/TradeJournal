@@ -89,18 +89,19 @@ namespace TradeJournal.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrEdit([Bind("Id,UserId,TransactionOpenDate,TransactionCloseDate,SymbolName,PositionType,PositionVolume,EntryPrice,StopLoss,TakeProfit,Comission,Swap,TradeOutcome,PriceChange")] Trade trade)
+        public async Task<IActionResult> AddOrEdit([Bind("Id,TransactionOpenDate,TransactionCloseDate,SymbolName,PositionType,PositionVolume,EntryPrice,StopLoss,TakeProfit,Comission,Swap,TradeOutcome,PriceChange")] Trade trade)
         {
-            Console.WriteLine($"Sesja aktywna: {await _sessionService.IsSessionActiveAsync()}");
-            HttpContext.Session.TryGetValue("key", out var key);
+            Console.WriteLine($"Sesja aktywna trade: {await _sessionService.IsSessionActiveAsync()}");
             var currentUser = await _userService.GetCurrentUser();
+            trade.UserId = (currentUser.Id);
 
-            if (ModelState.IsValid) 
+            Console.WriteLine($"{trade.Id} {trade.SymbolName} {trade.UserId}");
+
+            if (ModelState.IsValid) // to false jest
             {
-                if(trade.Id == 0) 
-                { 
-                    trade.UserId = currentUser.Id;
-                    _context.Add(trade); 
+                if (trade.Id == 0)
+                {
+                    _context.Add(trade);
                 }
                 else _context.Update(trade);
 
@@ -108,9 +109,12 @@ namespace TradeJournal.Controllers
                 return RedirectToAction(nameof(Index));
 
             }
+            
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                Console.WriteLine($"Error: {error.ErrorMessage}");
+            }
 
-            var errors = ModelState.Values.SelectMany(v => v.Errors);
-            foreach (var error in errors)  System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
 
             return View(trade);
         }

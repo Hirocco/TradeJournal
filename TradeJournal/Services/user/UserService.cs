@@ -106,8 +106,6 @@ namespace TradeJournal.Services.user
                     await _sessionService.InitializeSessionAsync(user.Id, updatedAccessToken.Ref_Token);
 
 
-
-                    Console.WriteLine($"Acess token: {updatedAccessToken.A_Token}");
                     return updatedAccessToken;
                 }
             }
@@ -126,9 +124,7 @@ namespace TradeJournal.Services.user
             _context.Tokens.Add(newToken);
             await _context.SaveChangesAsync();
             await _sessionService.InitializeSessionAsync(user.Id, tokenDto.Ref_Token);
-            Console.WriteLine($"Sesja aktywna: {await _sessionService.IsSessionActiveAsync()}");
-
-            Console.WriteLine($"Login token: {newToken.TokenVal}");
+            Console.WriteLine($"Sesja aktywna po loginie: {await _sessionService.IsSessionActiveAsync()}");
 
             return tokenDto;
         }
@@ -177,7 +173,11 @@ namespace TradeJournal.Services.user
         public async Task<UserDTO> GetCurrentUser()
         {
             var userId = await _sessionService.GetUserIdAsync();
-            var currentUser = await _context.Users.FindAsync(userId);
+            int convertedUserId = -1;
+            try { convertedUserId = Int32.Parse(userId); }
+            catch(FormatException e) { throw new Exception(e.Message); }
+
+            var currentUser = await _context.Users.FindAsync(convertedUserId);
             return new UserDTO
             {
                 Id = currentUser.Id,

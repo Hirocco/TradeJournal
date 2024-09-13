@@ -45,9 +45,7 @@ namespace TradeJournal.Controllers
                         Email = auth.Email,
                         Password = auth.Password
                     });
-                    //HttpContext.Session.SetString("key", "abcdefg");
-
-                    return View("~/Views/Dashboard/Index.cshtml");
+                    return RedirectToAction("Index", "Dashboard");
                 }
                 catch (UnauthorizedAccessException e)
                 {

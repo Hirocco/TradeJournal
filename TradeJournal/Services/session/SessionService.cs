@@ -20,10 +20,9 @@ namespace TradeJournal.Services.session
         // Inicjalizacja sesji użytkownika po zalogowaniu - mozliwe ze json trzeba 
         public Task InitializeSessionAsync(int userId, string refreshToken)
         {
-            //this.LoadSession();
-            _httpContextAccessor.HttpContext.Session.SetString("UserId", JsonSerializer.Serialize(userId));
+            _httpContextAccessor.HttpContext.Session.SetString("UserId", JsonSerializer.Serialize(userId.ToString()));
             _httpContextAccessor.HttpContext.Session.SetString("RefreshToken", JsonSerializer.Serialize(refreshToken));
-           // this.CommitSession();
+
 
             Console.WriteLine($"user id: {_httpContextAccessor.HttpContext.Session?.GetString("UserId")}");
             Console.WriteLine($"Refresh token: {_httpContextAccessor.HttpContext.Session?.GetString("RefreshToken")}");
@@ -34,7 +33,6 @@ namespace TradeJournal.Services.session
         // Pobiera UserId z sesji
         public  Task<string> GetUserIdAsync()
         {
-           //this.LoadSession();
             var userId = _httpContextAccessor.HttpContext.Session.GetString("UserId");
             if (userId == null) throw new Exception("Session could not retrive user.");
      
@@ -45,7 +43,6 @@ namespace TradeJournal.Services.session
         // Pobiera RefreshToken z sesji
         public Task<string> GetRefreshTokenAsync()
         {
-            //this.LoadSession();
             var reftoken = _httpContextAccessor.HttpContext.Session.GetString("RefreshToken");
 
             // Jeśli session jest pusta, zwróć null
@@ -59,7 +56,6 @@ namespace TradeJournal.Services.session
         // Sprawdza, czy sesja użytkownika jest aktywna
         public Task<bool> IsSessionActiveAsync()
         {
-            //this.LoadSession();
             var userId = _httpContextAccessor.HttpContext.Session.GetString("UserId");
             return Task.FromResult(JsonSerializer.Deserialize<bool>(!string.IsNullOrEmpty(userId)));
         }
@@ -67,9 +63,7 @@ namespace TradeJournal.Services.session
         // Odświeżenie sesji
         public Task RefreshSessionAsync(string refreshToken)
         {
-            //.LoadSession();
             _httpContextAccessor.HttpContext.Session.SetString("RefreshToken", refreshToken);
-            //this.CommitSession();
             return Task.CompletedTask;
         }
 
