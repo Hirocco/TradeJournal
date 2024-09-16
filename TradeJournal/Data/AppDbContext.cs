@@ -14,6 +14,7 @@ namespace TradeJournal.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Auth> Auths { get; set; }
         public DbSet<RefreshToken> Tokens { get; set; }
+        public DbSet<Playbook> Playbooks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
