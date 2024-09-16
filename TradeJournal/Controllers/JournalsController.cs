@@ -49,7 +49,7 @@ namespace TradeJournal.Controllers
                 return NotFound();
             }
 
-            var viewModel = new TradesJournalsViewModels
+            var viewModel = new TradesJournalsPlaybooksVM
             {
                 Trade = trade,
                 Journal = journal // Zakładamy, że Journal jest powiązany z Trade
@@ -136,21 +136,6 @@ namespace TradeJournal.Controllers
 
             return RedirectToAction("Details", "Trades");
 
-        }
-
-        // POST: Journals/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var journal = await _context.Journals.FindAsync(id);
-            if (journal != null)
-            {
-                _context.Journals.Remove(journal);
-            }
-            if (_context.Journals == null) return Problem("Entity set 'ApplicationDbContext.Journals'  is null.");
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool JournalExists(int id)

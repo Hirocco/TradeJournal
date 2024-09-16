@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TradeJournal.Data;
+using TradeJournal.Migrations;
 using TradeJournal.Models;
+using TradeJournal.ViewModels;
 
 namespace TradeJournal.Controllers
 {
@@ -37,124 +39,94 @@ namespace TradeJournal.Controllers
             var playbook = await _context.Playbooks
                 .Include(p => p.Trade)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (playbook == null)
+
+            var trade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == playbook.TradeId);
+
+
+            if (playbook == null || trade == null)
             {
                 return NotFound();
             }
 
-            return View(playbook);
+            var viewModel = new TradesJournalsPlaybooksVM
+            {
+                Trade = trade,
+                Playbook = playbook
+            };
+
+            return View("~/Views/Trades/Details.cshtml", viewModel);
         }
 
-        // GET: Playbooks/Create
-        public IActionResult Create()
+        // GET: Playbooks/AddOrEdit
+        public IActionResult AddOrEdit(int tradeId,int id = 0)
         {
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id");
-            return View();
+            if (id == 0) return View(new Playbook { TradeId = tradeId });
+            else
+            {
+                var playbook = _context.Playbooks.FirstOrDefault(p => p.Id == id);
+                if (playbook == null) return NotFound();
+
+                return PartialView("AddOrEditPlaybook", playbook);
+            }
         }
 
-        // POST: Playbooks/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //post
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Conditions,TradeId")] Playbook playbook)
+        public async Task<IActionResult> AddOrEdit([Bind("Id,Conditions,TradeId")] Playbook playbook)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(playbook);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id", playbook.TradeId);
-            return View(playbook);
-        }
-
-        // GET: Playbooks/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var playbook = await _context.Playbooks.FindAsync(id);
-            if (playbook == null)
-            {
-                return NotFound();
-            }
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id", playbook.TradeId);
-            return View(playbook);
-        }
-
-        // POST: Playbooks/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Conditions,TradeId")] Playbook playbook)
-        {
-            if (id != playbook.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                var existingPlaybook = await _context.Playbooks.FirstOrDefaultAsync(p => p.TradeId == playbook.TradeId);
+                if (existingPlaybook == null) _context.Add(playbook);
+                else
                 {
-                    _context.Update(playbook);
-                    await _context.SaveChangesAsync();
+                    existingPlaybook.Conditions = playbook.Conditions;
+                    _context.Update(existingPlaybook);
                 }
-                catch (DbUpdateConcurrencyException)
+                try { _context.SaveChangesAsync(); }
+                catch (DbUpdateConcurrencyException dbException)
                 {
-                    if (!PlaybookExists(playbook.Id))
+                    //The code from Microsoft - Resolving concurrency conflicts 
+                    foreach (var entry in dbException.Entries)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        if (entry.Entity is Playbook)
+                        {
+                            var proposedValues = entry.CurrentValues; //Your proposed changes
+                            var databaseValues = entry.GetDatabaseValues(); //Values in the Db
+
+                            foreach (var property in proposedValues.Properties)
+                            {
+                                var proposedValue = proposedValues[property];
+                                var databaseValue = databaseValues[property];
+
+                                // TODO: decide which value should be written to database
+                                // proposedValues[property] = <value to be saved>;
+                            }
+
+                            // Refresh original values to bypass next concurrency check
+                            entry.OriginalValues.SetValues(databaseValues);
+                        }
+                        else
+                        {
+                            throw new NotSupportedException(
+                                "Don't know how to handle concurrency conflicts for "
+                                + entry.Metadata.Name);
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["TradeId"] = new SelectList(_context.Trades, "Id", "Id", playbook.TradeId);
-            return View(playbook);
+            // Logowanie błędów walidacji do debugowania
+            var errors = ModelState.Values.SelectMany(v => v.Errors);
+            foreach (var error in errors)
+            {
+                System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
+            }
+
+            return RedirectToAction("Details", "Trades");
         }
 
-        // GET: Playbooks/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var playbook = await _context.Playbooks
-                .Include(p => p.Trade)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (playbook == null)
-            {
-                return NotFound();
-            }
-
-            return View(playbook);
-        }
-
-        // POST: Playbooks/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var playbook = await _context.Playbooks.FindAsync(id);
-            if (playbook != null)
-            {
-                _context.Playbooks.Remove(playbook);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+      
 
         private bool PlaybookExists(int id)
         {

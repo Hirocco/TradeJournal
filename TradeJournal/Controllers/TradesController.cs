@@ -67,7 +67,7 @@ namespace TradeJournal.Controllers
             }
 
             //tworzenie viewModelu
-            var viewModel = new TradesJournalsViewModels
+            var viewModel = new TradesJournalsPlaybooksVM
             {
                 Trade = trade,
                 Journal = journal

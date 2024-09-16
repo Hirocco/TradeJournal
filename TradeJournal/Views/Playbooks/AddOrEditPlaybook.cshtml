@@ -1,0 +1,17 @@
+﻿@model TradeJournal.Models.Playbook
+
+<hr />
+<div>
+    <form asp-controller="Playbooks" asp-action="AddOrEdit"> 
+        <div asp-validation-summary="ModelOnly"  class="text-danger"></div>
+        <input type="hidden" asp-for="Id" value="@(Model.Id == 0 ? "0" : Model.Id)" />
+        <input type="hidden" asp-for="@Model.TradeId"/>
+                <ejs-listview id="listview" dataSource="@ViewBag.ListData" showCheckBox="true" checkBoxPosition="Right">
+                    <e-listview-fieldsettings text="text" id="id"></e-listview-fieldsettings>
+                </ejs-listview>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

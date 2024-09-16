@@ -4,10 +4,10 @@ using TradeJournal.Models;
 
 namespace TradeJournal.ViewModels
 {
-    public class TradesJournalsViewModels
+    public class TradesJournalsPlaybooksVM
     {
         public Trade Trade { get; set; }
         public Journal Journal { get; set; }
-
+        public Playbook Playbook { get; set; }  
     }
 }
