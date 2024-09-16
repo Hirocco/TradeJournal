@@ -9,7 +9,7 @@ namespace TradeJournal.Models
         [Key]
         public int Id { get; set; }
 
-        [Column(TypeName = "nvarchar(1000)")]
+        [Column(TypeName = "nvarchar(max)")]
 
         public string Text { get; set; }
 

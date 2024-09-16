@@ -35,9 +35,10 @@ namespace TradeJournal.Controllers
                 .Where(t => t.UserId == currentUser.Id) // Filtruj tylko transakcje zalogowanego użytkownika
                 .ToListAsync();
 
+
+
             return View(trades);
         }
-
 
         // GET: Trades/Details/{Id}
         public async Task<IActionResult> Details(int? id)
@@ -72,12 +73,21 @@ namespace TradeJournal.Controllers
                 Journal = journal
             };
 
-            
-           //zwracamy oba
+            List<object> ListData = new List<object>();
+            ListData.Add(new { text = "Asia highs/lows taken", id = "list-1" });
+            ListData.Add(new { text = "BSL/SSL", id = "list-2" });
+            ListData.Add(new { text = "Market shift", id = "list-3" });
+            ListData.Add(new { text = "Liquidity taken", id = "list-4" });
+            ListData.Add(new { text = "FVG entry", id = "list-5" });
+
+            ViewBag.ListData = ListData;
+
+
+
+
+            //zwracamy oba
             return View(viewModel);
         }
-
-    
 
         // GET: Trades/AddOrEdit
         public IActionResult AddOrEdit(int id=0)
@@ -119,7 +129,6 @@ namespace TradeJournal.Controllers
             return View(trade);
         }
 
-
         // POST: Trades/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -137,5 +146,7 @@ namespace TradeJournal.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+    
     }
 }

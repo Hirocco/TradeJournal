@@ -4,89 +4,19 @@
     ViewData["Title"] = "Details";
 }
 
-
-<h1>Details</h1>
-<div class="row" style="height: 100vh;">
-    <!-- Pierwsza kolumna - Tabela -->
-    <div class="col-md-6" style="overflow-y: auto;">
-        <dl class="row">
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.TransactionOpenDate)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.TransactionOpenDate)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.TransactionCloseDate)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.TransactionCloseDate)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.SymbolName)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.SymbolName)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.PositionType)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.PositionType)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.PositionVolume)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.PositionVolume)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.EntryPrice)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.EntryPrice)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.StopLoss)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.StopLoss)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.TakeProfit)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.TakeProfit)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.Comission)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.Comission)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.Swap)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.Swap)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.TradeOutcome)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.TradeOutcome)
-            </dd>
-            <dt class="col-sm-4">
-                @Html.DisplayNameFor(model => model.Trade.PriceChange)
-            </dt>
-            <dd class="col-sm-8">
-                @Html.DisplayFor(model => model.Trade.PriceChange)
-            </dd>
-        </dl>
+<h2>@Html.DisplayFor(model => model.Trade.SymbolName) - @Html.DisplayFor(model => model.Trade.PositionType)</h2>
+<p>Open - close: @Html.DisplayFor(model => model.Trade.TransactionOpenDate) - @Html.DisplayFor(model => model.Trade.TransactionCloseDate)</p>
+<p>Outcome: @Html.DisplayFor(model => model.Trade.TradeOutcome)$</p>
+<hr />
+<div class="row mt-2" style="height: 100vh;">
+    <div class="col-md-6 mt-2" style="overflow-y: auto;">
+       <!-- TU BEDZIE CHECK LISTA - PLAYBOOK-->
+        <ejs-listview id="listview" dataSource="@ViewBag.ListData" showCheckBox="true" checkBoxPosition="Right">
+            <e-listview-fieldsettings text="text" id="id"></e-listview-fieldsettings>
+        </ejs-listview>
     </div>
-
     <!-- Druga kolumna - Journal -->
-    <div class="col-md-6" style="overflow-y: auto;">
+    <div class="col-md-6 h-100">
         <div class="h-100 w-100">
             @if (Model.Journal != null)
             {
@@ -102,7 +32,3 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="AddOrEdit" class="btn btn-success" asp-route-id="@Model?.Trade.Id">Edit</a> 
-    <a asp-action="Index" class="btn btn-success">Back to List</a>
-</div>
