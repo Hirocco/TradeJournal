@@ -11,15 +11,8 @@
 <div class="row mt-2" style="height: 100vh;">
     <div class="col-md-6 mt-2" style="overflow-y: auto;">
        <!-- TU BEDZIE CHECK LISTA - PLAYBOOK-->
-        @if (Model.Playbook != null)
-        {
-            System.Diagnostics.Debug.WriteLine("Playbook is not null, rendering partial view.");
-            await Html.RenderPartialAsync("~/Views/Playbooks/AddOrEditPlaybook.cshtml", this.Model.Playbook);
-        }
-        else
-        {
-            <p>No Playbook data available.</p>
-        }
+       @{await Html.RenderPartialAsync("~/Views/Playbooks/Index.cshtml", this.Model.Playbook);}
+
     </div>
     <!-- Druga kolumna - Journal -->
     <div class="col-md-6 h-100">

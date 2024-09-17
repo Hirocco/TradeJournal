@@ -8,9 +8,22 @@ namespace TradeJournal.Models
         [Key]
         public int Id { get; set; } 
 
-        public List<string> Conditions { get; set; } // warunki poszczegolnej strategii
+        public List<Condition> Conditions { get; set; } // warunki poszczegolnej strategii
 
         public int TradeId { get; set; }
         public Trade? Trade { get; set; }
+    }
+
+    public class Condition : IEntityBase
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public string ConditionName { get; set; }
+        public string ConditionId { get; set; }
+
+        public int PlaybookId   { get; set; }
+        public Playbook? Playbook { get; set; }
+    
     }
 }

@@ -15,7 +15,7 @@ namespace TradeJournal.Data
         public DbSet<Auth> Auths { get; set; }
         public DbSet<RefreshToken> Tokens { get; set; }
         public DbSet<Playbook> Playbooks { get; set; }
-
+        public DbSet<Condition> Conditions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -29,6 +29,11 @@ namespace TradeJournal.Data
                 .HasMany(a => a.RefreshToken)
                 .WithOne(t => t.Auth)
                 .HasForeignKey(t => t.AuthId);
+
+            modelBuilder.Entity<Playbook>()
+               .HasMany(p => p.Conditions)
+               .WithOne(c => c.Playbook)
+               .HasForeignKey(c => c.PlaybookId);
         }
     }
 }

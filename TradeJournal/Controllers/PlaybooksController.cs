@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using TradeJournal.Data;
 using TradeJournal.Migrations;
 using TradeJournal.Models;
+using TradeJournal.Services.user;
 using TradeJournal.ViewModels;
 
 namespace TradeJournal.Controllers
@@ -15,122 +16,66 @@ namespace TradeJournal.Controllers
     public class PlaybooksController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IUserService _userService;
 
-        public PlaybooksController(AppDbContext context)
+        public PlaybooksController(AppDbContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
-        // GET: Playbooks
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int tradeId)
         {
-            var appDbContext = _context.Playbooks.Include(p => p.Trade);
-            return View(await appDbContext.ToListAsync());
-        }
-
-        // GET: Playbooks/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var playbook = await _context.Playbooks
-                .Include(p => p.Trade)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(p => p.Conditions)
+                .FirstOrDefaultAsync(p => p.TradeId == tradeId);
 
-            var trade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == playbook.TradeId);
-
-
-            if (playbook == null || trade == null)
+            if (playbook == null)
             {
-                return NotFound();
+                playbook = new Playbook
+                {
+                    TradeId = tradeId,
+                    Conditions = new List<Condition>()
+                };
+                _context.Playbooks.Add(playbook);
+                await _context.SaveChangesAsync();
             }
 
-            var viewModel = new TradesJournalsPlaybooksVM
+            return PartialView("Index", playbook);
+        }
+
+        [HttpPost("Create")]
+        public async Task<IActionResult> CreateCondition(int playbookId, string conditionName)
+        {
+            var playbook = await _context.Playbooks
+                .Include(p => p.Conditions)
+                .FirstOrDefaultAsync(p => p.Id == playbookId);
+
+            if (playbook == null) return NotFound();
+
+            var condition = new Condition
             {
-                Trade = trade,
-                Playbook = playbook
+                ConditionName = conditionName,
+                PlaybookId = playbook.Id
             };
 
-            return View("~/Views/Trades/Details.cshtml", viewModel);
+            _context.Conditions.Add(condition);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index", new { tradeId = playbook.TradeId });
         }
 
-        // GET: Playbooks/AddOrEdit
-        public IActionResult AddOrEdit(int tradeId,int id = 0)
+        [HttpPost("Delete")]
+        public async Task<IActionResult> DeleteCondition(int conditionId)
         {
-            if (id == 0) return View(new Playbook { TradeId = tradeId });
-            else
-            {
-                var playbook = _context.Playbooks.FirstOrDefault(p => p.Id == id);
-                if (playbook == null) return NotFound();
+            var condition = await _context.Conditions.FindAsync(conditionId);
+            if (condition == null) return NotFound();
 
-                return PartialView("AddOrEditPlaybook", playbook);
-            }
-        }
+            _context.Conditions.Remove(condition);
+            await _context.SaveChangesAsync();
 
-        //post
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrEdit([Bind("Id,Conditions,TradeId")] Playbook playbook)
-        {
-            if (ModelState.IsValid)
-            {
-                var existingPlaybook = await _context.Playbooks.FirstOrDefaultAsync(p => p.TradeId == playbook.TradeId);
-                if (existingPlaybook == null) _context.Add(playbook);
-                else
-                {
-                    existingPlaybook.Conditions = playbook.Conditions;
-                    _context.Update(existingPlaybook);
-                }
-                try { _context.SaveChangesAsync(); }
-                catch (DbUpdateConcurrencyException dbException)
-                {
-                    //The code from Microsoft - Resolving concurrency conflicts 
-                    foreach (var entry in dbException.Entries)
-                    {
-                        if (entry.Entity is Playbook)
-                        {
-                            var proposedValues = entry.CurrentValues; //Your proposed changes
-                            var databaseValues = entry.GetDatabaseValues(); //Values in the Db
-
-                            foreach (var property in proposedValues.Properties)
-                            {
-                                var proposedValue = proposedValues[property];
-                                var databaseValue = databaseValues[property];
-
-                                // TODO: decide which value should be written to database
-                                // proposedValues[property] = <value to be saved>;
-                            }
-
-                            // Refresh original values to bypass next concurrency check
-                            entry.OriginalValues.SetValues(databaseValues);
-                        }
-                        else
-                        {
-                            throw new NotSupportedException(
-                                "Don't know how to handle concurrency conflicts for "
-                                + entry.Metadata.Name);
-                        }
-                    }
-                }
-            }
-            // Logowanie błędów walidacji do debugowania
-            var errors = ModelState.Values.SelectMany(v => v.Errors);
-            foreach (var error in errors)
-            {
-                System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
-            }
-
-            return RedirectToAction("Details", "Trades");
-        }
-
-      
-
-        private bool PlaybookExists(int id)
-        {
-            return _context.Playbooks.Any(e => e.Id == id);
+            return RedirectToAction("Index", new { tradeId = condition.Playbook.TradeId });
         }
     }
+
 }
