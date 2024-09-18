@@ -7,19 +7,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.EJ2.Inputs;
 using TradeJournal.Data;
 using TradeJournal.Models;
 using TradeJournal.ViewModels;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Hosting;
 
 namespace TradeJournal.Controllers
 {
     public class JournalsController : Controller
     {
         private readonly AppDbContext _context;
-
-        public JournalsController(AppDbContext context)
+        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnv;
+        public JournalsController(AppDbContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv)
         {
             _context = context;
+            _hostingEnv = hostingEnv;
         }
 
         // GET: Journals
@@ -49,7 +55,7 @@ namespace TradeJournal.Controllers
                 return NotFound();
             }
 
-            var viewModel = new TradesJournalsPlaybooksVM
+            var viewModel = new TradesJournalsVM
             {
                 Trade = trade,
                 Journal = journal // Zakładamy, że Journal jest powiązany z Trade
@@ -63,11 +69,11 @@ namespace TradeJournal.Controllers
         // GET: Journals/AddOrEdit
         public IActionResult AddOrEdit(int tradeId, int id = 0)
         {
-            if (id == 0) return View(new Journal{ TradeId = tradeId }); 
+            if (id == 0) return View(new Journal { TradeId = tradeId });
             else
             {
                 var journal = _context.Journals.FirstOrDefault(j => j.Id == id);
-                if (journal == null) return NotFound(); 
+                if (journal == null) return NotFound();
 
                 return PartialView("AddOrEdit", journal);
             }
@@ -85,8 +91,8 @@ namespace TradeJournal.Controllers
 
                 if (existingJounral == null) { _context.Add(journal); } // nowy rekord
 
-                else 
-                { 
+                else
+                {
                     existingJounral.Text = journal.Text;
                     _context.Update(existingJounral);
                 }
@@ -136,6 +142,46 @@ namespace TradeJournal.Controllers
 
             return RedirectToAction("Details", "Trades");
 
+        }
+
+
+        // naprawić
+        [AcceptVerbs("Post")]
+        public void UploadImage(IList<IFormFile> uploadFile)
+        {
+            Console.WriteLine("IMAGE UPLOAD");
+            try
+            {
+                foreach(IFormFile file in uploadFile)
+                {
+                    if (uploadFile != null)
+                    {
+                        string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        filename = _hostingEnv.WebRootPath + "\\Uploads" + $@"\{filename}";
+
+                        // Create a new directory, if it does not exists
+                        if (!Directory.Exists(_hostingEnv.WebRootPath + "\\Uploads"))
+                        {
+                            Directory.CreateDirectory(_hostingEnv.WebRootPath + "\\Uploads");
+                        }
+
+                        if (!System.IO.File.Exists(filename))
+                        {
+                            using (FileStream fs = System.IO.File.Create(filename))
+                            {
+                                file.CopyTo(fs);
+                                fs.Flush();
+                            }
+                            Response.StatusCode = 200;
+                        }
+                    }
+
+                }
+            }
+            catch (Exception)
+            {
+                Response.StatusCode = 204;
+            }
         }
 
         private bool JournalExists(int id)

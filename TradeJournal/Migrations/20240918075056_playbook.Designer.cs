@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradeJournal.Data;
 
@@ -11,9 +12,11 @@ using TradeJournal.Data;
 namespace TradeJournal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240918075056_playbook")]
+    partial class playbook
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,6 +52,32 @@ namespace TradeJournal.Migrations
                     b.ToTable("Auths");
                 });
 
+            modelBuilder.Entity("TradeJournal.Models.Condition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConditionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConditionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PlaybookId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlaybookId");
+
+                    b.ToTable("Conditions");
+                });
+
             modelBuilder.Entity("TradeJournal.Models.Journal", b =>
                 {
                     b.Property<int>("Id")
@@ -69,6 +98,28 @@ namespace TradeJournal.Migrations
                     b.HasIndex("TradeId");
 
                     b.ToTable("Journals");
+                });
+
+            modelBuilder.Entity("TradeJournal.Models.Playbook", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PlaybookTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TradeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TradeId");
+
+                    b.ToTable("Playbooks");
                 });
 
             modelBuilder.Entity("TradeJournal.Models.RefreshToken", b =>
@@ -186,7 +237,29 @@ namespace TradeJournal.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TradeJournal.Models.Condition", b =>
+                {
+                    b.HasOne("TradeJournal.Models.Playbook", "Playbook")
+                        .WithMany("Conditions")
+                        .HasForeignKey("PlaybookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Playbook");
+                });
+
             modelBuilder.Entity("TradeJournal.Models.Journal", b =>
+                {
+                    b.HasOne("TradeJournal.Models.Trade", "Trade")
+                        .WithMany()
+                        .HasForeignKey("TradeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trade");
+                });
+
+            modelBuilder.Entity("TradeJournal.Models.Playbook", b =>
                 {
                     b.HasOne("TradeJournal.Models.Trade", "Trade")
                         .WithMany()
@@ -222,6 +295,11 @@ namespace TradeJournal.Migrations
             modelBuilder.Entity("TradeJournal.Models.Auth", b =>
                 {
                     b.Navigation("RefreshToken");
+                });
+
+            modelBuilder.Entity("TradeJournal.Models.Playbook", b =>
+                {
+                    b.Navigation("Conditions");
                 });
 
             modelBuilder.Entity("TradeJournal.Models.User", b =>
