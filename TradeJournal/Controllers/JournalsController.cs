@@ -81,6 +81,7 @@ namespace TradeJournal.Controllers
 
             if (ModelState.IsValid)
             {
+                //handleImageUpdate();
                
                 var existingJournal = await _context.Journals.FirstOrDefaultAsync(j => j.TradeId == journal.TradeId);
 
@@ -142,7 +143,10 @@ namespace TradeJournal.Controllers
         }
 
 
-        
+        void handleImageUpdate(List<IFormFile> files)
+        {
+            /*todo - zapis, upadte do BD*/
+        }
 
         private bool JournalExists(int id)
         {
