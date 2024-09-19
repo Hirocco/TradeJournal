@@ -26,10 +26,6 @@
     <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="26.2.14" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\uploads\" />
-  </ItemGroup>
-
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

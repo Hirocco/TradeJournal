@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Hosting;
+using TradeJournal.Migrations;
 
 namespace TradeJournal.Controllers
 {
@@ -28,25 +29,18 @@ namespace TradeJournal.Controllers
             _hostingEnv = hostingEnv;
         }
 
-        // GET: Journals
-        public async Task<IActionResult> Index()
-        {
-            var appDbContext = _context.Journals.Include(j => j.Trade);
-            return View(await appDbContext.ToListAsync());
-        }
-
         // GET: Journals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) return NotFound();
+            
             var journal = await _context.Journals
                 .Include(t => t.TradeId)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
+            // Przekaż dane obrazu do widoku
+            if (journal.Image != null) ViewBag.ImageData = Convert.ToBase64String(journal.Image);
+            
             var trade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == journal.TradeId);
 
 
@@ -87,14 +81,17 @@ namespace TradeJournal.Controllers
 
             if (ModelState.IsValid)
             {
-                var existingJounral = await _context.Journals.FirstOrDefaultAsync(j => j.TradeId == journal.TradeId);
+               
+                var existingJournal = await _context.Journals.FirstOrDefaultAsync(j => j.TradeId == journal.TradeId);
 
-                if (existingJounral == null) { _context.Add(journal); } // nowy rekord
+                if (existingJournal == null) { _context.Add(journal); } // nowy rekord
 
                 else
                 {
-                    existingJounral.Text = journal.Text;
-                    _context.Update(existingJounral);
+                    existingJournal.Text = journal.Text;
+                    if (journal.ImageFile != null) existingJournal.Image = journal.Image;
+                   
+                    _context.Update(existingJournal);
                 }
                 Console.WriteLine(journal.Id); Console.WriteLine(journal.TradeId);
 
@@ -145,44 +142,7 @@ namespace TradeJournal.Controllers
         }
 
 
-        // naprawić
-        [AcceptVerbs("Post")]
-        public void UploadImage(IList<IFormFile> uploadFile)
-        {
-            Console.WriteLine("IMAGE UPLOAD");
-            try
-            {
-                foreach(IFormFile file in uploadFile)
-                {
-                    if (uploadFile != null)
-                    {
-                        string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                        filename = _hostingEnv.WebRootPath + "\\Uploads" + $@"\{filename}";
-
-                        // Create a new directory, if it does not exists
-                        if (!Directory.Exists(_hostingEnv.WebRootPath + "\\Uploads"))
-                        {
-                            Directory.CreateDirectory(_hostingEnv.WebRootPath + "\\Uploads");
-                        }
-
-                        if (!System.IO.File.Exists(filename))
-                        {
-                            using (FileStream fs = System.IO.File.Create(filename))
-                            {
-                                file.CopyTo(fs);
-                                fs.Flush();
-                            }
-                            Response.StatusCode = 200;
-                        }
-                    }
-
-                }
-            }
-            catch (Exception)
-            {
-                Response.StatusCode = 204;
-            }
-        }
+        
 
         private bool JournalExists(int id)
         {

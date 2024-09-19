@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileSystemGlobbing.Internal.Patterns;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -81,6 +82,9 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.UseStaticFiles();
+
 
 // Kolejnoœæ middleware
 app.UseRouting();
