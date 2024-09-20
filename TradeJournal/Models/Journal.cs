@@ -12,10 +12,7 @@ namespace TradeJournal.Models
         [Column(TypeName = "nvarchar(max)")]
 
         public string Text { get; set; }
-        public byte[]? Image { get; set; }
-
-        [NotMapped]  // Ignorujemy to pole w bazie danych, potrzebne do przechowywania pliku w formularzu
-        public IFormFile? ImageFile { get; set; }
+        public List<byte[]> ByteStream { get; set; }
 
         // relacje 
         public int TradeId { get; set; }

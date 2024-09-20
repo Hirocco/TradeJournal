@@ -20,9 +20,9 @@
             <input type="hidden" asp-for="@Model.TradeId"/>
 
              <div class="mb-3">
-                <ejs-richtexteditor class="text-white" value="@Model.Text" id="Text" >
+                <ejs-richtexteditor class="text-white" value="@Model.Text + @Model.ByteStream" id="Text" >
                     <e-richtexteditor-toolbarsettings items="tools"></e-richtexteditor-toolbarsettings>
-                    <e-richtexteditor-insertimagesettings saveUrl="UploadImage"></e-richtexteditor-insertimagesettings>
+                    <e-richtexteditor-insertimagesettings saveUrl="/Journals/SaveImage?Id=@Model.Id" path="/wwwroot/uploads"></e-richtexteditor-insertimagesettings>
                 </ejs-richtexteditor>
                 <span asp-validation-for="@Model.Text" class="text-danger"></span>
              </div>

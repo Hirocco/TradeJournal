@@ -37,9 +37,6 @@ namespace TradeJournal.Controllers
             var journal = await _context.Journals
                 .Include(t => t.TradeId)
                 .FirstOrDefaultAsync(t => t.Id == id);
-
-            // Przekaż dane obrazu do widoku
-            if (journal.Image != null) ViewBag.ImageData = Convert.ToBase64String(journal.Image);
             
             var trade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == journal.TradeId);
 
@@ -63,7 +60,7 @@ namespace TradeJournal.Controllers
         // GET: Journals/AddOrEdit
         public IActionResult AddOrEdit(int tradeId, int id = 0)
         {
-            if (id == 0) return View(new Journal { TradeId = tradeId });
+            if (id == 0) return View(new TradeJournal.Models.Journal { TradeId = tradeId });
             else
             {
                 var journal = _context.Journals.FirstOrDefault(j => j.Id == id);
@@ -76,13 +73,10 @@ namespace TradeJournal.Controllers
         // POST: Journals/AddOrEdit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] Journal journal)
+        public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] TradeJournal.Models.Journal journal)
         {
-
             if (ModelState.IsValid)
             {
-                //handleImageUpdate();
-               
                 var existingJournal = await _context.Journals.FirstOrDefaultAsync(j => j.TradeId == journal.TradeId);
 
                 if (existingJournal == null) { _context.Add(journal); } // nowy rekord
@@ -90,7 +84,6 @@ namespace TradeJournal.Controllers
                 else
                 {
                     existingJournal.Text = journal.Text;
-                    if (journal.ImageFile != null) existingJournal.Image = journal.Image;
                    
                     _context.Update(existingJournal);
                 }
@@ -103,7 +96,7 @@ namespace TradeJournal.Controllers
                     //The code from Microsoft - Resolving concurrency conflicts 
                     foreach (var entry in dbException.Entries)
                     {
-                        if (entry.Entity is Journal)
+                        if (entry.Entity is TradeJournal.Models.Journal)
                         {
                             var proposedValues = entry.CurrentValues; //Your proposed changes
                             var databaseValues = entry.GetDatabaseValues(); //Values in the Db
@@ -138,15 +131,46 @@ namespace TradeJournal.Controllers
                 System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
             }
 
-            return RedirectToAction("Details", "Trades");
+            return RedirectToAction("Details", "Trades", new { id = journal.TradeId });
 
         }
 
-
-        void handleImageUpdate(List<IFormFile> files)
+        [AcceptVerbs("Post")]
+        public void SaveImage(IList<IFormFile> UploadFiles, int id)
         {
-            /*todo - zapis, upadte do BD*/
+            try
+            {
+                foreach (IFormFile file in UploadFiles)
+                {
+                    if (UploadFiles != null)
+                    {
+                        string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        filename = _hostingEnv.WebRootPath + "\\uploads" + $@"\{filename}";
+
+                        // Create a new directory, if it does not exists
+                        if (!Directory.Exists(_hostingEnv.WebRootPath + "\\uploads"))
+                        {
+                            Directory.CreateDirectory(_hostingEnv.WebRootPath + "\\uploads");
+                        }
+
+                        if (!System.IO.File.Exists(filename))
+                        {
+                            using (FileStream fs = System.IO.File.Create(filename))
+                            {
+                                file.CopyTo(fs);
+                                fs.Flush();
+                            }
+                            Response.StatusCode = 200;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Response.StatusCode = 204;
+            }
         }
+
 
         private bool JournalExists(int id)
         {
