@@ -5,30 +5,24 @@
 namespace TradeJournal.Migrations
 {
     /// <inheritdoc />
-    public partial class JournalPhotoText : Migration
+    public partial class noPhoto : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-               name: "Text",
-               table: "Journals",
-               type: "nvarchar(max)",
-               nullable: false);
-
-            migrationBuilder.AlterColumn<byte>(
+            migrationBuilder.DropColumn(
                 name: "ByteStream",
-                table: "Journals",
-                type:"varbinary(max)",
-                nullable: true
-                );
-    
+                table: "Journals");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.AddColumn<byte[]>(
+                name: "ByteStream",
+                table: "Journals",
+                type: "varbinary(max)",
+                nullable: true);
         }
     }
 }

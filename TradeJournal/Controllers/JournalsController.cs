@@ -146,7 +146,7 @@ namespace TradeJournal.Controllers
                     {
                         //zamiast do folderu zmien to na logike zapisu do BD
 
-                        /*
+                        
                         string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                         filename = _hostingEnv.WebRootPath + "\\uploads" + $@"\{filename}";
 
@@ -164,10 +164,10 @@ namespace TradeJournal.Controllers
                                 fs.Flush();
                             }
                             Response.StatusCode = 200;
-                        }
-                        */
 
-                        using (var memoryStream = new MemoryStream())
+                        }
+
+                        /*using (var memoryStream = new MemoryStream())
                         {
                             await file.CopyToAsync(memoryStream);
                             byte[] fileBytes = memoryStream.ToArray();
@@ -186,7 +186,7 @@ namespace TradeJournal.Controllers
                             {
                                 return NotFound($"Journal with ID {id} not found.");
                             }
-                        }
+                        }*/
 
 
                     }

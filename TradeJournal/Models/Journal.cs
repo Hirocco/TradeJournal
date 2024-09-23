@@ -11,10 +11,9 @@ namespace TradeJournal.Models
 
         [Column(TypeName = "nvarchar(max)")]
         public string Text { get; set; }
-        
-        [Column(TypeName = "varbinary(max)")]
-        public byte[]? ByteStream { get; set; } = null;
 
+
+        
         // relacje 
         public int TradeId { get; set; }
         public Trade? Trade { get; set; }
