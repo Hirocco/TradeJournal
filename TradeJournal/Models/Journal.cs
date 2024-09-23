@@ -10,7 +10,6 @@ namespace TradeJournal.Models
         public int Id { get; set; }
 
         [Column(TypeName = "nvarchar(max)")]
-
         public string Text { get; set; }
 
         // relacje 
