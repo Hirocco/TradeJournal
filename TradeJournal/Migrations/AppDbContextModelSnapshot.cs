@@ -57,9 +57,8 @@ namespace TradeJournal.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ByteStream")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("ByteStream")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Text")
                         .IsRequired()

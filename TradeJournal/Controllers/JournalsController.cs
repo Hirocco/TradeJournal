@@ -131,12 +131,12 @@ namespace TradeJournal.Controllers
                 System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
             }
 
-            return RedirectToAction("Details", "Trades", new { id = journal.TradeId });
+            return Problem("Something went wrong");
 
         }
 
         [AcceptVerbs("Post")]
-        public void SaveImage(IList<IFormFile> UploadFiles, int id)
+        public async Task<IActionResult> SaveImage(IList<IFormFile> UploadFiles, int id)
         {
             try
             {
@@ -144,6 +144,9 @@ namespace TradeJournal.Controllers
                 {
                     if (UploadFiles != null)
                     {
+                        //zamiast do folderu zmien to na logike zapisu do BD
+
+                        /*
                         string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
                         filename = _hostingEnv.WebRootPath + "\\uploads" + $@"\{filename}";
 
@@ -162,12 +165,39 @@ namespace TradeJournal.Controllers
                             }
                             Response.StatusCode = 200;
                         }
+                        */
+
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await file.CopyToAsync(memoryStream);
+                            byte[] fileBytes = memoryStream.ToArray();
+
+                            // Pobierz wpis Journal z bazy danych
+                            var journal = await _context.Journals.FindAsync(id);
+
+                            if (journal != null)
+                            {
+                                // Przechowaj bajty w polu Journal
+                                journal.ByteStream = fileBytes;
+                                _context.Update(journal);
+                                await _context.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                return NotFound($"Journal with ID {id} not found.");
+                            }
+                        }
+
+
                     }
                 }
+                return Json(new { status = "success" });
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Response.StatusCode = 204;
+                Console.WriteLine($"Error: {ex.Message}");
+                return StatusCode(500, "Internal server error");
             }
         }
 
