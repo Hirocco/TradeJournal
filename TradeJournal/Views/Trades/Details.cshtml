@@ -8,15 +8,31 @@
 <p>Open - close: @Html.DisplayFor(model => model.Trade.TransactionOpenDate) - @Html.DisplayFor(model => model.Trade.TransactionCloseDate)</p>
 <p>Outcome: @Html.DisplayFor(model => model.Trade.TradeOutcome)$</p>
 <hr />
-<div class="mt-2 h-100">
-    @if (Model.Journal != null)
-    {
-        System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
-        await Html.RenderPartialAsync("~/Views/Journals/AddOrEdit.cshtml", this.Model.Journal);
-    }
-    else
-    {
-        <p>No journal data available.</p>
-    }
+<div class="row flex-row mt-2">
+    <!--div class="col-md-6 mt-2 w-100 h-100">
+        @if (Model.Journal != null)
+        {
+            System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
+            await Html.RenderPartialAsync("~/Views/Journals/AddImage.cshtml", this.Model.Journal);
+        }
+        else
+        {
+            <p>No journal data available.</p>
+        }
+    </!--div-->
+    
+    <div class="col-md-6 h-100 w-100">
+        @if (Model.Journal != null)
+        {
+            System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
+            await Html.RenderPartialAsync("~/Views/Journals/AddOrEdit.cshtml", this.Model.Journal);
+        }
+        else
+        {
+            <p>No journal data available.</p>
+        }
+    </div>
 </div>
+
+
 

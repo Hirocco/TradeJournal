@@ -73,18 +73,6 @@ namespace TradeJournal.Controllers
                 Journal = journal
             };
 
-            List<object> ListData = new List<object>();
-            ListData.Add(new { text = "Asia highs/lows taken", id = "list-1" });
-            ListData.Add(new { text = "BSL/SSL", id = "list-2" });
-            ListData.Add(new { text = "Market shift", id = "list-3" });
-            ListData.Add(new { text = "Liquidity taken", id = "list-4" });
-            ListData.Add(new { text = "FVG entry", id = "list-5" });
-
-            ViewBag.ListData = ListData;
-
-
-
-
             //zwracamy oba
             return View(viewModel);
         }

@@ -22,11 +22,9 @@ namespace TradeJournal.Controllers
     public class JournalsController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnv;
-        public JournalsController(AppDbContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnv)
+        public JournalsController(AppDbContext context)
         {
             _context = context;
-            _hostingEnv = hostingEnv;
         }
 
         // GET: Journals/Details/5
@@ -55,8 +53,6 @@ namespace TradeJournal.Controllers
             return View("~/Views/Trades/Details.cshtml", viewModel);
         }
 
-
-
         // GET: Journals/AddOrEdit
         public IActionResult AddOrEdit(int tradeId, int id = 0)
         {
@@ -73,7 +69,7 @@ namespace TradeJournal.Controllers
         // POST: Journals/AddOrEdit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] TradeJournal.Models.Journal journal)
+        public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] Journal journal)
         {
             if (ModelState.IsValid)
             {
@@ -134,73 +130,6 @@ namespace TradeJournal.Controllers
             return Problem("Something went wrong");
 
         }
-
-        [AcceptVerbs("Post")]
-        public async Task<IActionResult> SaveImage(IList<IFormFile> UploadFiles, int id)
-        {
-            try
-            {
-                foreach (IFormFile file in UploadFiles)
-                {
-                    if (UploadFiles != null)
-                    {
-                        //zamiast do folderu zmien to na logike zapisu do BD
-
-                        
-                        string filename = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                        filename = _hostingEnv.WebRootPath + "\\uploads" + $@"\{filename}";
-
-                        // Create a new directory, if it does not exists
-                        if (!Directory.Exists(_hostingEnv.WebRootPath + "\\uploads"))
-                        {
-                            Directory.CreateDirectory(_hostingEnv.WebRootPath + "\\uploads");
-                        }
-
-                        if (!System.IO.File.Exists(filename))
-                        {
-                            using (FileStream fs = System.IO.File.Create(filename))
-                            {
-                                file.CopyTo(fs);
-                                fs.Flush();
-                            }
-                            Response.StatusCode = 200;
-
-                        }
-
-                        /*using (var memoryStream = new MemoryStream())
-                        {
-                            await file.CopyToAsync(memoryStream);
-                            byte[] fileBytes = memoryStream.ToArray();
-
-                            // Pobierz wpis Journal z bazy danych
-                            var journal = await _context.Journals.FindAsync(id);
-
-                            if (journal != null)
-                            {
-                                // Przechowaj bajty w polu Journal
-                                journal.ByteStream = fileBytes;
-                                _context.Update(journal);
-                                await _context.SaveChangesAsync();
-                            }
-                            else
-                            {
-                                return NotFound($"Journal with ID {id} not found.");
-                            }
-                        }*/
-
-
-                    }
-                }
-                return Json(new { status = "success" });
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return StatusCode(500, "Internal server error");
-            }
-        }
-
 
         private bool JournalExists(int id)
         {
