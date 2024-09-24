@@ -9,11 +9,11 @@ namespace TradeJournal.Models
         [Key]
         public int Id { get; set; }
 
-        [Column(TypeName ="nvarchar(50)")] 
-        public string Title { get; set; }
-
         [Column(TypeName = "nvarchar(100)")]
         public string? ImageName { get; set; }
+
+        [Column(TypeName = "nvarchar(50)")]
+        public string Title { get; set; }
 
         [NotMapped]
         public IFormFile ImageFile{ get; set; }

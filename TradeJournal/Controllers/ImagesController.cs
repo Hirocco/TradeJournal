@@ -23,8 +23,11 @@ namespace TradeJournal.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            var image = await _context.Image.FindAsync(id);
+            var image = _context.Image.FirstOrDefault(i => i.Id == id);
             if (image == null) return NotFound();
+
+            ViewBag.ImagePath = Url.Content("~/Image/" + image.ImageName);
+            ViewBag.ImageTitle = image.Title;
 
             return View(image);
         }
@@ -35,8 +38,9 @@ namespace TradeJournal.Controllers
             return View();
         }
 
+
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddImage([Bind("Id,Title,ImageFile")] Image image)
         {
             if (ModelState.IsValid)

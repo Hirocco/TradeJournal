@@ -22,6 +22,7 @@ namespace TradeJournal.Controllers
     public class JournalsController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _hostingEnv;
         public JournalsController(AppDbContext context)
         {
             _context = context;
@@ -130,6 +131,8 @@ namespace TradeJournal.Controllers
             return Problem("Something went wrong");
 
         }
+
+
 
         private bool JournalExists(int id)
         {

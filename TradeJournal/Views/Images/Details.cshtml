@@ -1,35 +1,46 @@
 ﻿@model TradeJournal.Models.Image
 
-@{
-    ViewData["Title"] = "View";
-}
-
-
 <div>
-    <h4>Image</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageName)
-        </dd>
-        <dt class="col-sm-2">
-            Uploaded image: 
-        </dt>
-        <dd class="col-sm-10">
-            <img src="@("~/Image/" + Model.ImageName)" asp-append-version="true" />
-        </dd>
-    </dl>
+    <div class="col-lg-12 control-section default-carousel-section">
+        <div class="e-sample-resize-container carousel-sample">
+            <ejs-carousel id="defaultCarousel" cssClass="default-carousel">
+                <e-carousel-items>
+                    <e-carousel-item template="#image"></e-carousel-item>
+                </e-carousel-items>
+            </ejs-carousel>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<script id="image" type="text/x-template">
+    <figure class="img-container">
+        <img src="@ViewBag.ImagePath" alt="@ViewBag.ImageTitle" />
+        <figcaption class="img-caption">@ViewBag.ImageTitle</figcaption>
+    </figure>
+</script>
+
+
+<style>
+    .default-carousel-section .carousel-sample {
+        margin: 0 auto 2em;
+        max-width: 500px;
+        height: 300px;
+    }
+
+    .default-carousel .e-carousel-items .e-carousel-item .img-container {
+        height: 100%;
+    }
+
+    .default-carousel .e-carousel-items .e-carousel-item .img-caption {
+        bottom: 4em;
+        color: #fff;
+        font-size: 12pt;
+        height: 2em;
+        position: relative;
+        padding: 0.3em 1em;
+        text-align: center;
+        width: 100%;
+    }
+</style>
+
