@@ -33,5 +33,7 @@ namespace TradeJournal.Models
         [IgnoreDataMember]
         public User? User  { get; set; }
 
+        public List<Image>? Images { get; set; }
+
     }
 }

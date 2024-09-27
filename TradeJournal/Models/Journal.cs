@@ -16,8 +16,6 @@ namespace TradeJournal.Models
         public int TradeId { get; set; }
         public Trade? Trade { get; set; }
 
-        public int? ImageId { get; set; }
-        public Image? Image { get; set; }
 
     }
 }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TradeJournal.Data;
 using TradeJournal.Models;
+using TradeJournal.ViewModels;
 
 namespace TradeJournal.Controllers
 {
@@ -23,14 +25,19 @@ namespace TradeJournal.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
-            var image = _context.Image.FirstOrDefault(i => i.Id == id);
+            var image = await _context.Image.FirstOrDefaultAsync(i => i.Id == id);
             if (image == null) return NotFound();
 
-            ViewBag.ImagePath = Url.Content("~/Image/" + image.ImageName);
+            // Zakodowany obraz Base64
+            string base64Image = image.FileContent;
+
+            // Przekazanie zawartości obrazu i tytułu do ViewBag
+            ViewBag.ImageContent = "data:image/PNG;base64," + base64Image;
             ViewBag.ImageTitle = image.Title;
 
             return View(image);
         }
+
 
         // GET: Images/Create
         public IActionResult AddImage()
@@ -38,34 +45,34 @@ namespace TradeJournal.Controllers
             return View();
         }
 
-
-
         [HttpPost]
-        public async Task<IActionResult> AddImage([Bind("Id,Title,ImageFile")] Image image)
+        public async Task<IActionResult> AddImage([Bind("Id,Title,ImageFile,TradeId")] Image image)
         {
+            // Sprawdź, czy plik został przesłany
+            if (image.ImageFile != null && image.ImageFile.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await image.ImageFile.CopyToAsync(ms);
+                byte[] fileBytes = ms.ToArray();
+                image.FileContent = Convert.ToBase64String(fileBytes);
+            }
+            else
+            {
+                ModelState.AddModelError("ImageFile", "Image file is required.");
+                return RedirectToAction("Details", "Trades", new { id = image.TradeId });
+            }
+
+            Console.WriteLine($"FILE CONTENT: {image.FileContent}");
+
+            ModelState.ClearValidationState(nameof(Image));
             if (ModelState.IsValid)
             {
-                // save image to wwwroot/image
-                string wwwRootPath = _hostingEnv.WebRootPath;
-                string fileName = Path.GetFileNameWithoutExtension(image.ImageFile.FileName);
-                string extension = Path.GetExtension(image.ImageFile.FileName);
-
-                fileName = fileName + DateTime.Now.ToString("yymmsfff") + extension;
-                string path = Path.Combine(wwwRootPath + "/Image", fileName);
-
-                image.ImageName = fileName;
-
-                using (var fileStream = new FileStream(path, FileMode.Create))
-                {
-                    await image.ImageFile.CopyToAsync(fileStream);
-                }
-
                 // insert record
                 _context.Add(image);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Trades", new {id = image.TradeId});
             }
-            return View();
+            return RedirectToAction("Details", "Trades",new { image.TradeId });
         }
 
         // POST: Images/Delete/5

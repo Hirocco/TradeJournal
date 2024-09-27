@@ -20,6 +20,17 @@
             <p>No journal data available.</p>
         }
     </div>
+    <div class="col-md-6 h-100 w-100">
+        @if (Model.Image != null)
+        {
+            System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
+            await Html.RenderPartialAsync("~/Views/Images/Details.cshtml", this.Model.Image);
+        }
+        else
+        {
+            <p>No image data available.</p>
+        }
+    </div>
 </div>
 
 

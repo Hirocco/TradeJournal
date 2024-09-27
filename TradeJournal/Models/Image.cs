@@ -15,8 +15,16 @@ namespace TradeJournal.Models
         [Column(TypeName = "nvarchar(50)")]
         public string Title { get; set; }
 
+
+        [Column(TypeName = "nvarchar(max)")]
+        public string? FileContent { get; set; }
+
         [NotMapped]
         public IFormFile ImageFile{ get; set; }
+
+        //relacje
+        public int TradeId { get; set; }
+        public Trade? Trade { get; set; }
 
     }
 

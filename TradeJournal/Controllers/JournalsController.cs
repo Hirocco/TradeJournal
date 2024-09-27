@@ -28,36 +28,11 @@ namespace TradeJournal.Controllers
             _context = context;
         }
 
-        // GET: Journals/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-            
-            var journal = await _context.Journals
-                .Include(t => t.TradeId)
-                .FirstOrDefaultAsync(t => t.Id == id);
-            
-            var trade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == journal.TradeId);
-
-
-            if (journal == null || trade == null)
-            {
-                return NotFound();
-            }
-
-            var viewModel = new TradesJournalsVM
-            {
-                Trade = trade,
-                Journal = journal // Zakładamy, że Journal jest powiązany z Trade
-            };
-
-            return View("~/Views/Trades/Details.cshtml", viewModel);
-        }
-
+      
         // GET: Journals/AddOrEdit
         public IActionResult AddOrEdit(int tradeId, int id = 0)
         {
-            if (id == 0) return View(new TradeJournal.Models.Journal { TradeId = tradeId });
+            if (id == 0) return View(new Journal { TradeId = tradeId });
             else
             {
                 var journal = _context.Journals.FirstOrDefault(j => j.Id == id);

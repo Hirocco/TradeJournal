@@ -35,8 +35,6 @@ namespace TradeJournal.Controllers
                 .Where(t => t.UserId == currentUser.Id) // Filtruj tylko transakcje zalogowanego użytkownika
                 .ToListAsync();
 
-
-
             return View(trades);
         }
 
@@ -55,6 +53,7 @@ namespace TradeJournal.Controllers
             //nie znaleziono trade
             if (trade == null) return NotFound();
      
+
             //podlaczanie notatki pod trade
             var journal = await _context.Journals.FirstOrDefaultAsync(j=>j.TradeId == trade.Id);
             if (journal == null)
@@ -66,14 +65,33 @@ namespace TradeJournal.Controllers
                 };
             }
 
+            //podlaczenie zdjecia - tu go widzi 
+            var image = await _context.Image.FirstOrDefaultAsync(i => i.TradeId == trade.Id);
+            if (image == null)
+            {
+                image = new Image
+                {
+                    TradeId = trade.Id,
+                    Trade = trade
+                };
+            }
+
+            // Zakodowany obraz Base64
+            string base64Image = image.FileContent;
+
+            // Przekazanie zawartości obrazu i tytułu do ViewBag
+            ViewBag.ImageContent = "data:image/PNG;base64," + base64Image;
+            ViewBag.ImageTitle = image.Title;
+
             //tworzenie viewModelu
             var viewModel = new TradesJournalsVM
             {
                 Trade = trade,
-                Journal = journal
+                Journal = journal,
+                Image = image,
             };
 
-            //zwracamy oba
+            //zwracamy vm
             return View(viewModel);
         }
 

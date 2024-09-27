@@ -8,5 +8,6 @@ namespace TradeJournal.ViewModels
     {
         public Trade Trade { get; set; }
         public Journal Journal { get; set; }
+        public List<Image> Image { get; set; }
     }
 }
