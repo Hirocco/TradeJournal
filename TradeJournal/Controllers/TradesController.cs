@@ -65,30 +65,32 @@ namespace TradeJournal.Controllers
                 };
             }
 
-            //podlaczenie zdjecia - tu go widzi 
-            var image = await _context.Image.FirstOrDefaultAsync(i => i.TradeId == trade.Id);
-            if (image == null)
+            // Pobranie listy obrazów powiązanych z transakcją
+            var images = await _context.Image.Where(i => i.TradeId == trade.Id).ToListAsync();
+            if (images == null || !images.Any())
             {
-                image = new Image
-                {
-                    TradeId = trade.Id,
-                    Trade = trade
-                };
+                return NotFound("No images found for this trade.");
             }
 
-            // Zakodowany obraz Base64
-            string base64Image = image.FileContent;
+            // Tworzenie listy base64 dla każdego obrazu
+            List<string> base64Images = new List<string>();
+            foreach (var image in images)
+            {
+                string base64Image = "data:image/jpeg;charset=utf-8;base64," + image.FileContent;
+                base64Images.Add(base64Image);
+            }
 
-            // Przekazanie zawartości obrazu i tytułu do ViewBag
-            ViewBag.ImageContent = "data:image/PNG;base64," + base64Image;
-            ViewBag.ImageTitle = image.Title;
+            // Przekazanie listy obrazów do ViewBag
+            ViewBag.ImagesContent = base64Images;
+            ViewBag.ImagesTitles = images.Select(i => i.Title).ToList();
+
 
             //tworzenie viewModelu
             var viewModel = new TradesJournalsVM
             {
                 Trade = trade,
                 Journal = journal,
-                Image = image,
+                Image = images,
             };
 
             //zwracamy vm

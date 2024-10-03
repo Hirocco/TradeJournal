@@ -23,21 +23,6 @@ namespace TradeJournal.Controllers
             _hostingEnv = hostingEnv;
         }
 
-        public async Task<IActionResult> Details(int? id)
-        {
-            var image = await _context.Image.FirstOrDefaultAsync(i => i.Id == id);
-            if (image == null) return NotFound();
-
-            // Zakodowany obraz Base64
-            string base64Image = image.FileContent;
-
-            // Przekazanie zawartości obrazu i tytułu do ViewBag
-            ViewBag.ImageContent = "data:image/PNG;base64," + base64Image;
-            ViewBag.ImageTitle = image.Title;
-
-            return View(image);
-        }
-
 
         // GET: Images/Create
         public IActionResult AddImage()
@@ -54,6 +39,9 @@ namespace TradeJournal.Controllers
                 using var ms = new MemoryStream();
                 await image.ImageFile.CopyToAsync(ms);
                 byte[] fileBytes = ms.ToArray();
+
+                
+
                 image.FileContent = Convert.ToBase64String(fileBytes);
             }
             else

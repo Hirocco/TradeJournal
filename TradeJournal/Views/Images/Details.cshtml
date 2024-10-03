@@ -1,4 +1,4 @@
-﻿@model TradeJournal.Models.Image
+﻿@model List<TradeJournal.Models.Image>
 
 <div>
     <hr />
@@ -6,7 +6,10 @@
         <div class="e-sample-resize-container carousel-sample">
             <ejs-carousel id="defaultCarousel" autoPlay="false" cssClass="default-carousel">
                 <e-carousel-items>
-                    <e-carousel-item template="#image"></e-carousel-item>
+                    @for (int i = 0; i < ViewBag.ImagesContent.Count; i++)
+                    {
+                        <e-carousel-item template="#image@i"></e-carousel-item>
+                    }
                 </e-carousel-items>
             </ejs-carousel>
         </div>
@@ -19,12 +22,16 @@
     }
 </div>
 
-<script id="image" type="text/x-template">
-    <figure class="img-container">
-        <img class="w-100 h-100" src="@ViewBag.ImageContent" asp-append-version="true" />
-        <figcaption class="img-caption">@ViewBag.ImageTitle</figcaption>
-    </figure>
-</script>
+@for (int i = 0; i < ViewBag.ImagesContent.Count; i++)
+{
+    <script id="image@(i)" type="text/x-template">
+        <figure class="img-container">
+            <img class="w-100 h-100" src="@ViewBag.ImagesContent[i]" alt="@ViewBag.ImagesTitles[i]" />
+            <figcaption class="img-caption">@ViewBag.ImagesTitles[i]</figcaption>
+        </figure>
+    </script>
+}
+
 
 
 <style>
