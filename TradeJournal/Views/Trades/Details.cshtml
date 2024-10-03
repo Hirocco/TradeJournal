@@ -12,14 +12,12 @@
     <div class="col-md-6 h-100 w-100">
         
         @{
-            System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
             await Html.RenderPartialAsync("~/Views/Journals/AddOrEdit.cshtml", this.Model.Journal);
         }
 
     </div>
     <div class="col-md-6 h-100 w-100">
         @{
-            System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
             await Html.RenderPartialAsync("~/Views/Images/Details.cshtml", this.Model.Image);
         }
     </div>

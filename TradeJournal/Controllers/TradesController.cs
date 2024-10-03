@@ -69,7 +69,12 @@ namespace TradeJournal.Controllers
             var images = await _context.Image.Where(i => i.TradeId == trade.Id).ToListAsync();
             if (images == null || !images.Any())
             {
-                return NotFound("No images found for this trade.");
+                var image = new Image
+                {
+                    TradeId = trade.Id,
+                    Trade = trade
+                };
+                images.Add(image);
             }
 
             // Tworzenie listy base64 dla każdego obrazu
