@@ -5,24 +5,25 @@
 namespace TradeJournal.Migrations
 {
     /// <inheritdoc />
-    public partial class noPhoto : Migration
+    public partial class trademodelchanges : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ByteStream",
-                table: "Journals");
+                name: "PriceChange",
+                table: "Trades");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<byte[]>(
-                name: "ByteStream",
-                table: "Journals",
-                type: "varbinary(max)",
-                nullable: true);
+            migrationBuilder.AddColumn<float>(
+                name: "PriceChange",
+                table: "Trades",
+                type: "real",
+                nullable: false,
+                defaultValue: 0f);
         }
     }
 }

@@ -6,7 +6,8 @@
 
 <h2>@Html.DisplayFor(model => model.Trade.SymbolName) - @Html.DisplayFor(model => model.Trade.PositionType)</h2>
 <p>Open - close: @Html.DisplayFor(model => model.Trade.TransactionOpenDate) - @Html.DisplayFor(model => model.Trade.TransactionCloseDate)</p>
-<p>Outcome: @Html.DisplayFor(model => model.Trade.TradeOutcome)$</p>
+<hr/>
+<p>RR: @(Math.Round((Model.Trade.TakeProfit - Model.Trade.EntryPrice) / (Model.Trade.EntryPrice - Model.Trade.StopLoss), 2)) | Price Change: @(Math.Round(((Model.Trade.TakeProfit - Model.Trade.EntryPrice) / Model.Trade.EntryPrice) * 100, 2))% | Outcome: @Html.DisplayFor(model => model.Trade.TradeOutcome)$</p>
 <hr />
 <div class="row flex-row mt-2">
     <div class="col-md-6 h-100 w-100">

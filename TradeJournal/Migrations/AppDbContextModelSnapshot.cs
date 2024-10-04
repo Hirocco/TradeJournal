@@ -145,9 +145,6 @@ namespace TradeJournal.Migrations
                     b.Property<float>("PositionVolume")
                         .HasColumnType("real");
 
-                    b.Property<float>("PriceChange")
-                        .HasColumnType("real");
-
                     b.Property<float>("StopLoss")
                         .HasColumnType("real");
 
