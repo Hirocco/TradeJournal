@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradeJournal.Data;
 
@@ -11,9 +12,11 @@ using TradeJournal.Data;
 namespace TradeJournal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240924110610_ImageModel2")]
+    partial class ImageModel2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,22 +60,15 @@ namespace TradeJournal.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("FileContent")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImageName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("TradeId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TradeId");
 
                     b.ToTable("Image");
                 });
@@ -85,6 +81,9 @@ namespace TradeJournal.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ImageId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -93,6 +92,8 @@ namespace TradeJournal.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ImageId");
 
                     b.HasIndex("TradeId");
 
@@ -214,24 +215,19 @@ namespace TradeJournal.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TradeJournal.Models.Image", b =>
-                {
-                    b.HasOne("TradeJournal.Models.Trade", "Trade")
-                        .WithMany("Images")
-                        .HasForeignKey("TradeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Trade");
-                });
-
             modelBuilder.Entity("TradeJournal.Models.Journal", b =>
                 {
+                    b.HasOne("TradeJournal.Models.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
+
                     b.HasOne("TradeJournal.Models.Trade", "Trade")
                         .WithMany()
                         .HasForeignKey("TradeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Image");
 
                     b.Navigation("Trade");
                 });
@@ -261,11 +257,6 @@ namespace TradeJournal.Migrations
             modelBuilder.Entity("TradeJournal.Models.Auth", b =>
                 {
                     b.Navigation("RefreshToken");
-                });
-
-            modelBuilder.Entity("TradeJournal.Models.Trade", b =>
-                {
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("TradeJournal.Models.User", b =>

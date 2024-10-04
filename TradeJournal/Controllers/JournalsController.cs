@@ -7,67 +7,36 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.EJ2.Inputs;
 using TradeJournal.Data;
 using TradeJournal.Models;
 using TradeJournal.ViewModels;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Hosting;
+using TradeJournal.Migrations;
 
 namespace TradeJournal.Controllers
 {
     public class JournalsController : Controller
     {
         private readonly AppDbContext _context;
-
+        private readonly IWebHostEnvironment _hostingEnv;
         public JournalsController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: Journals
-        public async Task<IActionResult> Index()
-        {
-            var appDbContext = _context.Journals.Include(j => j.Trade);
-            return View(await appDbContext.ToListAsync());
-        }
-
-        // GET: Journals/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var journal = await _context.Journals
-                .Include(t => t.TradeId)
-                .FirstOrDefaultAsync(t => t.Id == id);
-
-            var trade = await _context.Trades.FirstOrDefaultAsync(t => t.Id == journal.TradeId);
-
-
-            if (journal == null || trade == null)
-            {
-                return NotFound();
-            }
-
-            var viewModel = new TradesJournalsViewModels
-            {
-                Trade = trade,
-                Journal = journal // Zakładamy, że Journal jest powiązany z Trade
-            };
-
-            return View("~/Views/Trades/Details.cshtml", viewModel);
-        }
-
-
-
+      
         // GET: Journals/AddOrEdit
         public IActionResult AddOrEdit(int tradeId, int id = 0)
         {
-            if (id == 0) return View(new Journal{ TradeId = tradeId }); 
+            if (id == 0) return View(new Journal { TradeId = tradeId });
             else
             {
                 var journal = _context.Journals.FirstOrDefault(j => j.Id == id);
-                if (journal == null) return NotFound(); 
+                if (journal == null) return NotFound();
 
                 return PartialView("AddOrEdit", journal);
             }
@@ -78,17 +47,17 @@ namespace TradeJournal.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddOrEdit([Bind("Id,Text,TradeId")] Journal journal)
         {
-
             if (ModelState.IsValid)
             {
-                var existingJounral = await _context.Journals.FirstOrDefaultAsync(j => j.TradeId == journal.TradeId);
+                var existingJournal = await _context.Journals.FirstOrDefaultAsync(j => j.TradeId == journal.TradeId);
 
-                if (existingJounral == null) { _context.Add(journal); } // nowy rekord
+                if (existingJournal == null) { _context.Add(journal); } // nowy rekord
 
-                else 
-                { 
-                    existingJounral.Text = journal.Text;
-                    _context.Update(existingJounral);
+                else
+                {
+                    existingJournal.Text = journal.Text;
+                   
+                    _context.Update(existingJournal);
                 }
                 Console.WriteLine(journal.Id); Console.WriteLine(journal.TradeId);
 
@@ -99,7 +68,7 @@ namespace TradeJournal.Controllers
                     //The code from Microsoft - Resolving concurrency conflicts 
                     foreach (var entry in dbException.Entries)
                     {
-                        if (entry.Entity is Journal)
+                        if (entry.Entity is TradeJournal.Models.Journal)
                         {
                             var proposedValues = entry.CurrentValues; //Your proposed changes
                             var databaseValues = entry.GetDatabaseValues(); //Values in the Db
@@ -134,24 +103,11 @@ namespace TradeJournal.Controllers
                 System.Diagnostics.Debug.WriteLine(error.ErrorMessage);
             }
 
-            return RedirectToAction("Details", "Trades");
+            return Problem("Something went wrong");
 
         }
 
-        // POST: Journals/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var journal = await _context.Journals.FindAsync(id);
-            if (journal != null)
-            {
-                _context.Journals.Remove(journal);
-            }
-            if (_context.Journals == null) return Problem("Entity set 'ApplicationDbContext.Journals'  is null.");
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+
 
         private bool JournalExists(int id)
         {

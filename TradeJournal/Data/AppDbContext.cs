@@ -14,6 +14,7 @@ namespace TradeJournal.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Auth> Auths { get; set; }
         public DbSet<RefreshToken> Tokens { get; set; }
+        public DbSet<Image> Image { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,5 +30,6 @@ namespace TradeJournal.Data
                 .WithOne(t => t.Auth)
                 .HasForeignKey(t => t.AuthId);
         }
+       
     }
 }

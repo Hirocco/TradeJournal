@@ -7,28 +7,26 @@
         "LowerCase", "UpperCase", "|",
         "Formats", "Alignments", "OrderedList", "UnorderedList",
         "Outdent", "Indent", "|",
-        "CreateLink", "Image", "CreateTable", "|", "ClearFormat", "Print",
+        "CreateLink", "Image","FileManager" ,"CreateTable", "|", "ClearFormat", "Print",
         "SourceCode", "FullScreen", "|", "Undo", "Redo"
     };
 }
 
 <div class="row d-flex justify-content-center align-items-center">
     <div class="col-md-7 w-100 h-100">
-        <form asp-controller="Journals" asp-action="AddOrEdit"> <!--tu jest blad, przekeirowywuje zle, bo zamiast do journals to do trades-->
+        <form  asp-controller="Journals" asp-action="AddOrEdit"> 
             <div asp-validation-summary="ModelOnly"  class="text-danger"></div>
             <input type="hidden" asp-for="Id" value="@(Model.Id == 0 ? "0" : Model.Id)" />
             <input type="hidden" asp-for="@Model.TradeId"/>
 
              <div class="mb-3">
                 <ejs-richtexteditor class="text-white" value="@Model.Text" id="Text" >
-                    <e-richtexteditor-toolbarsettings  items="tools"></e-richtexteditor-toolbarsettings>
-                        
+                    <e-richtexteditor-toolbarsettings items="tools"></e-richtexteditor-toolbarsettings>
                 </ejs-richtexteditor>
-                <span asp-validation-for="@Model.Text" class="text-danger"></span>
              </div>
 
             <div class="mb-3">
-                <ejs-button cssClass="w-100" id="submit" type="submit" content="Add note"></ejs-button>
+                <ejs-button id="note_button" cssClass="w-100" type="submit" content="Add note"></ejs-button>
             </div>
         </form>
     </div>
@@ -36,4 +34,6 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
 }
+
