@@ -5,7 +5,7 @@
 namespace TradeJournal.Migrations
 {
     /// <inheritdoc />
-    public partial class testRelations : Migration
+    public partial class many_photos : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

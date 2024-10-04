@@ -12,8 +12,8 @@ using TradeJournal.Data;
 namespace TradeJournal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240905102451_auth")]
-    partial class auth
+    [Migration("20240927110351_many_photos")]
+    partial class many_photos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,6 +52,34 @@ namespace TradeJournal.Migrations
                     b.ToTable("Auths");
                 });
 
+            modelBuilder.Entity("TradeJournal.Models.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FileContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageName")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("TradeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TradeId");
+
+                    b.ToTable("Image");
+                });
+
             modelBuilder.Entity("TradeJournal.Models.Journal", b =>
                 {
                     b.Property<int>("Id")
@@ -62,7 +90,7 @@ namespace TradeJournal.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TradeId")
                         .HasColumnType("int");
@@ -84,9 +112,6 @@ namespace TradeJournal.Migrations
 
                     b.Property<int>("AuthId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("RefreshTokenCreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("RefreshTokenExpiresAt")
                         .HasColumnType("datetime2");
@@ -151,7 +176,7 @@ namespace TradeJournal.Migrations
                     b.Property<DateTime>("TransactionOpenDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -192,6 +217,17 @@ namespace TradeJournal.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TradeJournal.Models.Image", b =>
+                {
+                    b.HasOne("TradeJournal.Models.Trade", "Trade")
+                        .WithMany("Images")
+                        .HasForeignKey("TradeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trade");
+                });
+
             modelBuilder.Entity("TradeJournal.Models.Journal", b =>
                 {
                     b.HasOne("TradeJournal.Models.Trade", "Trade")
@@ -216,14 +252,23 @@ namespace TradeJournal.Migrations
 
             modelBuilder.Entity("TradeJournal.Models.Trade", b =>
                 {
-                    b.HasOne("TradeJournal.Models.User", null)
+                    b.HasOne("TradeJournal.Models.User", "User")
                         .WithMany("Trades")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TradeJournal.Models.Auth", b =>
                 {
                     b.Navigation("RefreshToken");
+                });
+
+            modelBuilder.Entity("TradeJournal.Models.Trade", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("TradeJournal.Models.User", b =>

@@ -1,4 +1,4 @@
-﻿@model TradeJournal.ViewModels.TradesJournalsViewModels
+﻿@model TradeJournal.ViewModels.TradesJournalsVM
 
 @{
     ViewData["Title"] = "Details";
@@ -8,27 +8,20 @@
 <p>Open - close: @Html.DisplayFor(model => model.Trade.TransactionOpenDate) - @Html.DisplayFor(model => model.Trade.TransactionCloseDate)</p>
 <p>Outcome: @Html.DisplayFor(model => model.Trade.TradeOutcome)$</p>
 <hr />
-<div class="row mt-2" style="height: 100vh;">
-    <div class="col-md-6 mt-2" style="overflow-y: auto;">
-       <!-- TU BEDZIE CHECK LISTA - PLAYBOOK-->
-        <ejs-listview id="listview" dataSource="@ViewBag.ListData" showCheckBox="true" checkBoxPosition="Right">
-            <e-listview-fieldsettings text="text" id="id"></e-listview-fieldsettings>
-        </ejs-listview>
-    </div>
-    <!-- Druga kolumna - Journal -->
-    <div class="col-md-6 h-100">
-        <div class="h-100 w-100">
-            @if (Model.Journal != null)
-            {
-                System.Diagnostics.Debug.WriteLine("Journal is not null, rendering partial view.");
-                await Html.RenderPartialAsync("~/Views/Journals/AddOrEdit.cshtml", this.Model.Journal);
-            }
-            else
-            {
-                <p>No journal data available.</p>
-            }
+<div class="row flex-row mt-2">
+    <div class="col-md-6 h-100 w-100">
+        
+        @{
+            await Html.RenderPartialAsync("~/Views/Journals/AddOrEdit.cshtml", this.Model.Journal);
+        }
 
-        </div>
+    </div>
+    <div class="col-md-6 h-100 w-100">
+        @{
+            await Html.RenderPartialAsync("~/Views/Images/Details.cshtml", this.Model.Image);
+        }
     </div>
 </div>
+
+
 

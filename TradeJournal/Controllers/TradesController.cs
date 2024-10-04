@@ -35,8 +35,6 @@ namespace TradeJournal.Controllers
                 .Where(t => t.UserId == currentUser.Id) // Filtruj tylko transakcje zalogowanego użytkownika
                 .ToListAsync();
 
-
-
             return View(trades);
         }
 
@@ -55,6 +53,7 @@ namespace TradeJournal.Controllers
             //nie znaleziono trade
             if (trade == null) return NotFound();
      
+
             //podlaczanie notatki pod trade
             var journal = await _context.Journals.FirstOrDefaultAsync(j=>j.TradeId == trade.Id);
             if (journal == null)
@@ -66,26 +65,40 @@ namespace TradeJournal.Controllers
                 };
             }
 
+            // Pobranie listy obrazów powiązanych z transakcją
+            var images = await _context.Image.Where(i => i.TradeId == trade.Id).ToListAsync();
+            if (images == null || !images.Any())
+            {
+                var image = new Image
+                {
+                    TradeId = trade.Id,
+                    Trade = trade
+                };
+                images.Add(image);
+            }
+
+            // Tworzenie listy base64 dla każdego obrazu
+            List<string> base64Images = new List<string>();
+            foreach (var image in images)
+            {
+                string base64Image = "data:image/jpeg;charset=utf-8;base64," + image.FileContent;
+                base64Images.Add(base64Image);
+            }
+
+            // Przekazanie listy obrazów do ViewBag
+            ViewBag.ImagesContent = base64Images;
+            ViewBag.ImagesTitles = images.Select(i => i.Title).ToList();
+
+
             //tworzenie viewModelu
-            var viewModel = new TradesJournalsViewModels
+            var viewModel = new TradesJournalsVM
             {
                 Trade = trade,
-                Journal = journal
+                Journal = journal,
+                Image = images,
             };
 
-            List<object> ListData = new List<object>();
-            ListData.Add(new { text = "Asia highs/lows taken", id = "list-1" });
-            ListData.Add(new { text = "BSL/SSL", id = "list-2" });
-            ListData.Add(new { text = "Market shift", id = "list-3" });
-            ListData.Add(new { text = "Liquidity taken", id = "list-4" });
-            ListData.Add(new { text = "FVG entry", id = "list-5" });
-
-            ViewBag.ListData = ListData;
-
-
-
-
-            //zwracamy oba
+            //zwracamy vm
             return View(viewModel);
         }
 

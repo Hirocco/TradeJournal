@@ -5,16 +5,16 @@
 namespace TradeJournal.Migrations
 {
     /// <inheritdoc />
-    public partial class Journal2 : Migration
+    public partial class nullable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "Text",
-                table: "Journals",
-                type: "nvarchar(1000)",
-                nullable: false,
+                name: "FileContent",
+                table: "Image",
+                type: "nvarchar(max)",
+                nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
         }
@@ -23,12 +23,14 @@ namespace TradeJournal.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "Text",
-                table: "Journals",
+                name: "FileContent",
+                table: "Image",
                 type: "nvarchar(max)",
                 nullable: false,
+                defaultValue: "",
                 oldClrType: typeof(string),
-                oldType: "nvarchar(1000)");
+                oldType: "nvarchar(max)",
+                oldNullable: true);
         }
     }
 }

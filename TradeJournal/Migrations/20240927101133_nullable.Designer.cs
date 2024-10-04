@@ -12,8 +12,8 @@ using TradeJournal.Data;
 namespace TradeJournal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240916084601_pelna moc")]
-    partial class pelnamoc
+    [Migration("20240927101133_nullable")]
+    partial class nullable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,34 @@ namespace TradeJournal.Migrations
                         .IsUnique();
 
                     b.ToTable("Auths");
+                });
+
+            modelBuilder.Entity("TradeJournal.Models.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FileContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageName")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("TradeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TradeId");
+
+                    b.ToTable("Image");
                 });
 
             modelBuilder.Entity("TradeJournal.Models.Journal", b =>
@@ -187,6 +215,17 @@ namespace TradeJournal.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TradeJournal.Models.Image", b =>
+                {
+                    b.HasOne("TradeJournal.Models.Trade", "Trade")
+                        .WithMany()
+                        .HasForeignKey("TradeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trade");
                 });
 
             modelBuilder.Entity("TradeJournal.Models.Journal", b =>
