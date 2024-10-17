@@ -1,5 +1,13 @@
 ﻿@model IEnumerable<TradeJournal.Models.Image>
 
+
+@if (Model == null || Model.All(img => string.IsNullOrEmpty(img.Title)))
+{
+    System.Diagnostics.Debug.WriteLine("Rendering image add partial view.");
+    await Html.RenderPartialAsync("~/Views/Images/AddImage.cshtml", Model.First());
+}
+else
+{
 <div>
     <hr />
     <div class="col-lg-12 control-section default-carousel-section">
@@ -21,6 +29,8 @@
         await Html.RenderPartialAsync("~/Views/Images/AddImage.cshtml", Model.First());
     }
 </div>
+}
+
 
 @foreach (var image in Model)
 {
