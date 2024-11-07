@@ -26,10 +26,13 @@ namespace TradeJournal.Controllers
         {
             var currentUser = await _userService.GetCurrentUser();
 
-
+            //sprobojemy zrobic procedure skladowa dla spisywania tradeow.
             //trade uzytkownika
-            List<Trade> selectedTrades = await _context.Trades.Where(t => t.UserId == currentUser.Id).ToListAsync();
 
+            //List<Trade> selectedTrades = await _context.Trades.Where(t => t.UserId == currentUser.Id).ToListAsync();
+            List<Trade> selectedTrades =  await _context.Trades
+                                               .FromSqlInterpolated($"EXEC GetUserTrades @UserId={currentUser.Id}")
+                                               .ToListAsync();
 
             // total swaps + commisions 
             float totalSwapComissions = selectedTrades.Sum(t => (t.Comission + t.Swap));

@@ -31,10 +31,13 @@ namespace TradeJournal.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userService.GetCurrentUser();
+            // podmiana na procedure skladowana
+            /*var trades = await _context.Trades
+                            .Where(t => t.UserId == currentUser.Id) // Filtruj tylko transakcje zalogowanego użytkownika
+                            .ToListAsync();*/
             var trades = await _context.Trades
-                .Where(t => t.UserId == currentUser.Id) // Filtruj tylko transakcje zalogowanego użytkownika
-                .ToListAsync();
-
+                          .FromSqlInterpolated($"EXEC GetUserTrades @UserId={currentUser.Id}")
+                          .ToListAsync();
             return View(trades);
         }
 
